@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shared.Models;
+using Shared.Models.Blog;
 
 namespace Server.Data;
 
