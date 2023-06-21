@@ -9,6 +9,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options
                 .UseSqlite(builder.Configuration.GetConnectionString("conexion")));
 
 builder.Services.AddServiceExtensions();
+builder.Services.ConfigureCors();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -27,6 +28,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseRouting();
+app.UseCors("corspolicy");
 
 app.UseAuthorization();
 

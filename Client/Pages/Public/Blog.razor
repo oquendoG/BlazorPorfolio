@@ -9,20 +9,37 @@
             <p>Click a category card to view its blog posts.</p>
 
             <div class="row">
-                <div class="col-md-4">
-                   <CategoryCard />
-                </div>
-
-                <div class="col-md-4">
-                    <CategoryCard />
-                </div>
-
-                <div class="col-md-4">
-                    <CategoryCard />
-                </div>
-
+                @if(MemoryDataBaseCache.Categories is not null)
+                {
+                    for (int i = 0; i < MemoryDataBaseCache.Categories.Count; i++)
+                    {
+                        <div class="col-md-4">
+                            <CategoryCard Category="MemoryDataBaseCache.Categories[i]" />
+                        </div>
+                    }
+                }
             </div>
         </div>
     </div>
 
 </main>
+
+@implements IDisposable
+@code {
+
+    [Inject] InMemoryDataBaseCache MemoryDataBaseCache { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        MemoryDataBaseCache.OnCategoriesDataChanged += StateHasChanged;
+        if (MemoryDataBaseCache.Categories is null)
+        {
+            await MemoryDataBaseCache.GetCategoriesFromDatabaseAndCache();
+        }
+    }
+
+    public void Dispose()
+    {
+        MemoryDataBaseCache.OnCategoriesDataChanged -= StateHasChanged;
+    }
+}
