@@ -7,7 +7,7 @@ using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Categories.Queries;
 
-public record GetCategoriesQuery : IRequest<List<CategoryDTO>>{}
+public record GetCategoriesQuery : IRequest<List<CategoryDTO>>;
 
 public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDTO>>
 {
