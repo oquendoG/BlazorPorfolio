@@ -31,4 +31,10 @@
     <Folder Include="Feats\Blog\Categories\Commands\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\AppDb.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
