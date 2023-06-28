@@ -75,7 +75,7 @@ body {
 }
 
 .f-size-3 {
-    font-size: 3rem;
+    font-size: 2rem;
 }
 
 /* 4. Components (buttons, cards etc.) */
@@ -132,7 +132,7 @@ body {
 
 @media (min-width: 992px) {
     .md-f-size-1-5 {
-        font-size: 1.5rem;
+        font-size: 1rem;
     }
 }
 
