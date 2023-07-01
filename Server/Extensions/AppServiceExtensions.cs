@@ -1,4 +1,6 @@
-﻿using Server.Feats.Blog.Categories.Queries;
+﻿using Server.Data;
+using Server.Feats.Blog.Categories.Queries;
+using Shared.Models.Blog;
 
 namespace Server.Extensions;
 
