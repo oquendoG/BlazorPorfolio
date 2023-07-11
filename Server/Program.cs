@@ -1,14 +1,24 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Server.Data;
 using Server.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//configuramos el logger
+var loggger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(loggger);
+
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options => options
                 .UseSqlite(builder.Configuration.GetConnectionString("conexion")));
 
-builder.Services.AddServiceExtensions();
+builder.Services.AddMediatrConfigs();
 builder.Services.ConfigureCors();
 
 builder.Services.AddControllers();
