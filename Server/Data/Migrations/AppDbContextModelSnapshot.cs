@@ -7,7 +7,7 @@ using Server.Data;
 
 #nullable disable
 
-namespace Server.Data.Migrations
+namespace Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -45,21 +45,21 @@ namespace Server.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7cbf1695-5b80-4759-b170-207d892cb7a0"),
+                            Id = new Guid("c1e6e821-4a35-42d5-b0f2-2544d7651b03"),
                             Description = "Description of category 1",
                             Name = "Category 1",
                             ThumbnailImage = "uploads/placeholder.jpg"
                         },
                         new
                         {
-                            Id = new Guid("ae303d15-baa8-40c8-ab75-1b50176a8cec"),
+                            Id = new Guid("7721b335-da37-428a-9e5a-74ed430d38a3"),
                             Description = "Description of category 2",
                             Name = "Category 2",
                             ThumbnailImage = "uploads/placeholder.jpg"
                         },
                         new
                         {
-                            Id = new Guid("d52ce8e2-5887-4f28-897d-b450b4510dd6"),
+                            Id = new Guid("026749b3-f2a7-41a9-873f-82e9303e9500"),
                             Description = "Description of category 3",
                             Name = "Category 3",
                             ThumbnailImage = "uploads/placeholder.jpg"
@@ -98,7 +98,7 @@ namespace Server.Data.Migrations
                     b.Property<bool>("Published")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Thunbnailimage")
+                    b.Property<string>("Thumbnailimage")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -112,79 +112,79 @@ namespace Server.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Post");
+                    b.ToTable("Posts");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8671a8d1-9632-481a-a139-c5a260ce2073"),
+                            Id = new Guid("9e921a05-0786-49e7-a15e-3bc8ef1f2196"),
                             Author = "Wilson OQuendo",
-                            CategoryId = new Guid("7cbf1695-5b80-4759-b170-207d892cb7a0"),
+                            CategoryId = new Guid("c1e6e821-4a35-42d5-b0f2-2544d7651b03"),
                             Content = "",
                             Excerpt = "Este es un extracto del post 1.",
-                            PublishDate = "30/06/2023 03:21",
+                            PublishDate = "11/07/2023 11:51",
                             Published = false,
-                            Thunbnailimage = "uploads/placeholder.jpg",
+                            Thumbnailimage = "uploads/placeholder.jpg",
                             Title = "Primer Post"
                         },
                         new
                         {
-                            Id = new Guid("976e66fb-f922-46c1-9888-2734f145f609"),
+                            Id = new Guid("4f38237f-5a49-4f4f-803c-b51bb503b7c8"),
                             Author = "Wilson OQuendo",
-                            CategoryId = new Guid("ae303d15-baa8-40c8-ab75-1b50176a8cec"),
+                            CategoryId = new Guid("7721b335-da37-428a-9e5a-74ed430d38a3"),
                             Content = "",
                             Excerpt = "Este es un extracto del post 2.",
-                            PublishDate = "30/06/2023 03:21",
+                            PublishDate = "11/07/2023 11:51",
                             Published = false,
-                            Thunbnailimage = "uploads/placeholder.jpg",
+                            Thumbnailimage = "uploads/placeholder.jpg",
                             Title = "Segundo Post"
                         },
                         new
                         {
-                            Id = new Guid("ac361cd7-1f95-46e8-9216-4d879fb1c5c7"),
+                            Id = new Guid("95ce2f22-313e-435f-a33f-6c45fe883fca"),
                             Author = "Wilson OQuendo",
-                            CategoryId = new Guid("d52ce8e2-5887-4f28-897d-b450b4510dd6"),
+                            CategoryId = new Guid("026749b3-f2a7-41a9-873f-82e9303e9500"),
                             Content = "",
                             Excerpt = "Este es un extracto del post 3.",
-                            PublishDate = "30/06/2023 03:21",
+                            PublishDate = "11/07/2023 11:51",
                             Published = false,
-                            Thunbnailimage = "uploads/placeholder.jpg",
+                            Thumbnailimage = "uploads/placeholder.jpg",
                             Title = "Tercer Post"
                         },
                         new
                         {
-                            Id = new Guid("5c741e22-a811-467c-af9b-ca939e28fdf9"),
+                            Id = new Guid("b24e9288-4398-45f9-a3fa-ff574de6e107"),
                             Author = "Wilson OQuendo",
-                            CategoryId = new Guid("7cbf1695-5b80-4759-b170-207d892cb7a0"),
+                            CategoryId = new Guid("c1e6e821-4a35-42d5-b0f2-2544d7651b03"),
                             Content = "",
                             Excerpt = "Este es un extracto del post 4.",
-                            PublishDate = "30/06/2023 03:21",
+                            PublishDate = "11/07/2023 11:51",
                             Published = false,
-                            Thunbnailimage = "uploads/placeholder.jpg",
+                            Thumbnailimage = "uploads/placeholder.jpg",
                             Title = "Cuarto Post"
                         },
                         new
                         {
-                            Id = new Guid("b61ec2dd-8302-4356-be1c-70476bc3c040"),
+                            Id = new Guid("f30feed2-8421-4197-9542-917c88e62ae5"),
                             Author = "Wilson OQuendo",
-                            CategoryId = new Guid("ae303d15-baa8-40c8-ab75-1b50176a8cec"),
+                            CategoryId = new Guid("7721b335-da37-428a-9e5a-74ed430d38a3"),
                             Content = "",
                             Excerpt = "Este es un extracto del post 5.",
-                            PublishDate = "30/06/2023 03:21",
+                            PublishDate = "11/07/2023 11:51",
                             Published = false,
-                            Thunbnailimage = "uploads/placeholder.jpg",
+                            Thumbnailimage = "uploads/placeholder.jpg",
                             Title = "Quinto Post"
                         },
                         new
                         {
-                            Id = new Guid("557f5c87-7b91-40f0-afb4-c2b47db86411"),
+                            Id = new Guid("7a58f248-f419-4643-b0ee-949f422c61a3"),
                             Author = "Wilson OQuendo",
-                            CategoryId = new Guid("d52ce8e2-5887-4f28-897d-b450b4510dd6"),
+                            CategoryId = new Guid("026749b3-f2a7-41a9-873f-82e9303e9500"),
                             Content = "",
                             Excerpt = "Este es un extracto del post 6.",
-                            PublishDate = "30/06/2023 03:21",
+                            PublishDate = "11/07/2023 11:51",
                             Published = false,
-                            Thunbnailimage = "uploads/placeholder.jpg",
+                            Thumbnailimage = "uploads/placeholder.jpg",
                             Title = "Sexto Post"
                         });
                 });

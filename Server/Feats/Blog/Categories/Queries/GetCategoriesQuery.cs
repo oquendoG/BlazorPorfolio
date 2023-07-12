@@ -7,18 +7,18 @@ using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Categories.Queries;
 
-public record GetCategoriesQuery : IRequest<List<CategoryDTO>>;
+public record GetCategoriesQueryRequest : IRequest<List<CategoryDTO>>;
 
-public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDTO>>
+public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQueryRequest, List<CategoryDTO>>
 {
     private readonly AppDbContext context;
 
-    public GetCategoriesHandler(AppDbContext context)
+    public GetCategoriesQueryHandler(AppDbContext context)
     {
         this.context = context;
     }
 
-    public async Task<List<CategoryDTO>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<List<CategoryDTO>> Handle(GetCategoriesQueryRequest request, CancellationToken cancellationToken)
     {
         List<Category> categoriesDb = await context.Categories.ToListAsync(cancellationToken);
         return categoriesDb.Adapt<List<CategoryDTO>>();

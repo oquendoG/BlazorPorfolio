@@ -6,9 +6,9 @@ using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Categories.Commands;
 
-public record CreateCategoryCommand(CategoryDTO Category) : IRequest<int>;
+public record CreateCategoryCommandRequest(CategoryDTO Category) : IRequest<int>;
 
-public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, int>
+public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommandRequest, int>
 {
     private readonly AppDbContext dbContext;
     private readonly ILogger<CreateCategoryCommandHandler> logger;
@@ -18,7 +18,7 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
         this.dbContext = dbContext;
         this.logger = logger;
     }
-    public async Task<int> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateCategoryCommandRequest request, CancellationToken cancellationToken)
     {
         Category category = request.Category.Adapt<Category>();
         try

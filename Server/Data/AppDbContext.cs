@@ -10,7 +10,8 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Category> Categories { get; set; }
-    public List<Post> Posts { get; set; }
+    public DbSet<Post> Posts { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         #region Categories seed
@@ -80,7 +81,7 @@ public class AppDbContext : DbContext
             {
                 Id = Guid.NewGuid(),
                 Title = postTitle,
-                Thunbnailimage = "uploads/placeholder.jpg",
+                Thumbnailimage = "uploads/placeholder.jpg",
                 Excerpt = $"Este es un extracto del post {i}.",
                 Content = string.Empty,
                 PublishDate = DateTimeOffset.UtcNow.ToString("dd/MM/yyyy hh:mm"),

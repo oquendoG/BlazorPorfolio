@@ -4,18 +4,18 @@ using Server.Data;
 
 namespace Server.Feats.Blog.Categories.Queries;
 
-public record CheckIfCategoryExistsQuery(Guid Id) : IRequest<bool>;
+public record CheckIfCategoryExistsQueryRequest(Guid Id) : IRequest<bool>;
 
-public class CheckIfCategoryExistsHandler : IRequestHandler<CheckIfCategoryExistsQuery, bool>
+public class CheckIfCategoryExistsQueryHandler : IRequestHandler<CheckIfCategoryExistsQueryRequest, bool>
 {
     private readonly AppDbContext dbContext;
 
-    public CheckIfCategoryExistsHandler(AppDbContext dbContext)
+    public CheckIfCategoryExistsQueryHandler(AppDbContext dbContext)
     {
         this.dbContext = dbContext;
     }
 
-    public async Task<bool> Handle(CheckIfCategoryExistsQuery request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CheckIfCategoryExistsQueryRequest request, CancellationToken cancellationToken)
     {
         return await dbContext.Categories.AnyAsync(cat => cat.Id == request.Id, cancellationToken);
     }

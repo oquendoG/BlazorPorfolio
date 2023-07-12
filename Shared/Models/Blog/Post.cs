@@ -17,7 +17,7 @@ public class Post
 
     [Required]
     [MaxLength(256)]
-    public string Thunbnailimage { get; set; }
+    public string Thumbnailimage { get; set; }
 
     [Required]
     [MaxLength(65536)]

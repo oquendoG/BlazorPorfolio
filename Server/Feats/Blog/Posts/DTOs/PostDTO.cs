@@ -8,7 +8,7 @@ public class PostDTO
 
     public string Excerpt { get; set; }
 
-    public string Thunbnailimage { get; set; }
+    public string Thumbnailimage { get; set; }
 
     public string Content { get; set; }
 

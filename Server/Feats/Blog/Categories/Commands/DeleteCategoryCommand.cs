@@ -6,8 +6,8 @@ using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Categories.Commands;
 
-public record DeleteCategoryCommand(CategoryPostsDTO Category) : IRequest<int>;
-public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, int>
+public record DeleteCategoryCommandRequest(CategoryPostsDTO Category) : IRequest<int>;
+public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommandRequest, int>
 {
     private readonly AppDbContext dbContext;
     private readonly ILogger<DeleteCategoryCommandHandler> logger;
@@ -17,7 +17,7 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
         this.dbContext = dbContext;
         this.logger = logger;
     }
-    public async Task<int> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(DeleteCategoryCommandRequest request, CancellationToken cancellationToken)
     {
         Category category = request.Category.Adapt<Category>();
         try

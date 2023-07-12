@@ -23,14 +23,14 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CategoryDTO>>> Get()
     {
-        return await mediator.Send(new GetCategoriesQuery());
+        return await mediator.Send(new GetCategoriesQueryRequest());
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(Guid id)
     {
         CategoryPostsDTO category =
-            await mediator.Send(new GetByIdQuery(id, false));
+            await mediator.Send(new GetCategoryByIdQueryRequest(id, false));
 
         return Ok(category);
     }
@@ -39,7 +39,7 @@ public class CategoriesController : ControllerBase
     [HttpGet("withposts")]
     public async Task<IActionResult> GetWithPosts()
     {
-        return Ok(await mediator.Send(new GetCategoriesWithPostsQuery()));
+        return Ok(await mediator.Send(new GetCategoriesWithPostsQueryRequest()));
     }
 
     //website.com/api/categories/id
@@ -47,7 +47,7 @@ public class CategoriesController : ControllerBase
     public async Task<IActionResult> GetWithPosts(Guid id)
     {
         CategoryPostsDTO category =
-            await mediator.Send(new GetByIdQuery(id, true));
+            await mediator.Send(new GetCategoryByIdQueryRequest(id, true));
 
         return Ok(category);
     }
@@ -65,7 +65,7 @@ public class CategoriesController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        int result = await mediator.Send(new CreateCategoryCommand(category));
+        int result = await mediator.Send(new CreateCategoryCommandRequest(category));
         if (result == 0)
         {
             return StatusCode(500, "Ha hábido una excepción por favor comuniquese con el administrador del sistema o mire los logs");
@@ -87,13 +87,13 @@ public class CategoriesController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        bool checking = await mediator.Send(new CheckIfCategoryExistsQuery(id));
+        bool checking = await mediator.Send(new CheckIfCategoryExistsQueryRequest(id));
         if (!checking)
         {
             return NotFound("La categoría no existe");
         }
 
-        int result = await mediator.Send(new UpdateCategoryCommand(category));
+        int result = await mediator.Send(new UpdateCategoryCommandRequest(category));
         if (result == 0)
         {
             return StatusCode(500, "Ha hábido una excepción por favor comuniquese con el administrador del sistema o mire los logs");
@@ -110,7 +110,7 @@ public class CategoriesController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        CategoryPostsDTO categoryDb = await mediator.Send(new GetByIdQuery(id, false));
+        CategoryPostsDTO categoryDb = await mediator.Send(new GetCategoryByIdQueryRequest(id, false));
         if (categoryDb is null)
         {
             return NotFound("La categoría no existe");
@@ -122,13 +122,13 @@ public class CategoriesController : ControllerBase
             System.IO.File.Delete($"{hostEnvironment.ContentRootPath}\\wwwroot\\uploads{filename}");
         }
 
-        int result = await mediator.Send(new DeleteCategoryCommand(categoryDb));
+        int result = await mediator.Send(new DeleteCategoryCommandRequest(categoryDb));
         if (result == 0)
         {
             return StatusCode(500, "Ha hábido una excepción por favor comuniquese con el administrador del sistema o mire los logs");
         }
 
-        return NoContent();
+        return Ok(result);
     }
     #endregion
 }

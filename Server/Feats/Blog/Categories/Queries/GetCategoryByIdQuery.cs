@@ -7,18 +7,18 @@ using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Categories.Queries;
 
-public record GetByIdQuery(Guid CategoryId, bool WithPosts) : IRequest<CategoryPostsDTO>;
+public record GetCategoryByIdQueryRequest(Guid CategoryId, bool WithPosts) : IRequest<CategoryPostsDTO>;
 
-public class GetByIdQueryhandler : IRequestHandler<GetByIdQuery, CategoryPostsDTO>
+public class GetCategoryByIdQueryhandler : IRequestHandler<GetCategoryByIdQueryRequest, CategoryPostsDTO>
 {
     private readonly AppDbContext dbContext;
 
-    public GetByIdQueryhandler(AppDbContext dbContext)
+    public GetCategoryByIdQueryhandler(AppDbContext dbContext)
     {
         this.dbContext = dbContext;
     }
 
-    public async Task<CategoryPostsDTO> Handle(GetByIdQuery request, CancellationToken cancellationToken)
+    public async Task<CategoryPostsDTO> Handle(GetCategoryByIdQueryRequest request, CancellationToken cancellationToken)
     {
         Category category = null;
         if (request.WithPosts)
