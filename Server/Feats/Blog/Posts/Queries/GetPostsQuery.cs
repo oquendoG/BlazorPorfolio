@@ -20,6 +20,7 @@ public class GetPostsQueryHandler : IRequestHandler<GetPostsQueryRequest, List<P
     public async Task<List<PostDTO>> Handle(GetPostsQueryRequest request, CancellationToken cancellationToken)
     {
         IEnumerable<Post> postsdb = await context.Posts
+             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
         return postsdb.Adapt<List<PostDTO>>();

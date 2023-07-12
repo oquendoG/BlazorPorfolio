@@ -38,7 +38,8 @@ public class UpdatePostCommandHandler : IRequestHandler<UpdatePostCommandRequest
 
         try
         {
-            dbContext.Posts.Update(PostToUpdate);
+            Post OldPost = await dbContext.Posts.FindAsync(new object[] { request.OldPost.Id }, cancellationToken);
+            dbContext.Entry(OldPost).CurrentValues.SetValues(PostToUpdate);
             return await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)

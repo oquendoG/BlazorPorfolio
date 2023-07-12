@@ -17,6 +17,8 @@ public class CheckIfCategoryExistsQueryHandler : IRequestHandler<CheckIfCategory
 
     public async Task<bool> Handle(CheckIfCategoryExistsQueryRequest request, CancellationToken cancellationToken)
     {
-        return await dbContext.Categories.AnyAsync(cat => cat.Id == request.Id, cancellationToken);
+        return await dbContext.Categories
+            .AsNoTracking()
+            .AnyAsync(cat => cat.Id == request.Id, cancellationToken);
     }
 }

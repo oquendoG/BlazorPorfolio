@@ -17,6 +17,8 @@ public class CheckIfPostExistsQueryHandler : IRequestHandler<CheckIfPostExistsQu
 
     public async Task<bool> Handle(CheckIfPostExistsQueryRequest request, CancellationToken cancellationToken)
     {
-        return await dbContext.Categories.AnyAsync(cat => cat.Id == request.Id, cancellationToken);
+        return await dbContext.Categories
+            .AsNoTracking()
+            .AnyAsync(cat => cat.Id == request.Id, cancellationToken);
     }
 }

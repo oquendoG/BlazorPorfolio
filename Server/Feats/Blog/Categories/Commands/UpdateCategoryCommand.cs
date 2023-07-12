@@ -19,11 +19,23 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
     }
     public async Task<int> Handle(UpdateCategoryCommandRequest request, CancellationToken cancellationToken)
     {
-        Category category = request.Category.Adapt<Category>();
         try
         {
-            dbContext.Categories.Update(category);
-            return await dbContext.SaveChangesAsync(cancellationToken);
+            Category category = await dbContext.Categories.FindAsync(new object[] { request.Category.Id }, cancellationToken);
+
+            if (category != null)
+            {
+                // Copia solo las propiedades modificadas del objeto request.Category a la entidad existente
+                dbContext.Entry(category).CurrentValues.SetValues(request.Category);
+
+                // Llama a SaveChanges() para guardar los cambios en la base de datos
+                return await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            else
+            {
+                // La entidad no existe en la base de datos
+                return 0;
+            }
         }
         catch (Exception ex)
         {
