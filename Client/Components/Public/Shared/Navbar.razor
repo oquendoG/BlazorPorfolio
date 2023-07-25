@@ -58,27 +58,26 @@
 
     private bool IsPageActive(string pageToCheckUri)
     {
-        string[] currentUriSplitBetweenSlashes = NavigationManager.Uri.Split('/').Skip(3).ToArray();
+        string[] currentUriSplit = NavigationManager.Uri
+            .Split('/')
+            .Skip(3)
+            .ToArray();
 
         if (pageToCheckUri == HomePageUri)
         {
-            if (currentUriSplitBetweenSlashes.Last().Length == 0)
+            return currentUriSplit.Last().Length == 0;
+        }
+
+        string[] pageToCheckUriSplit = pageToCheckUri
+            .Split('/')
+            .Skip(1)
+            .ToArray();
+
+        foreach (var currentUriPart in currentUriSplit)
+        {
+            if (pageToCheckUriSplit.Contains(currentUriPart))
             {
                 return true;
-            }
-        }
-        else
-        {
-            string[] pageToCheckUriSplitBetweenSlashes = pageToCheckUri.Split('/').Skip(1).ToArray();
-            foreach (string currentUriPart in currentUriSplitBetweenSlashes)
-            {
-                foreach (string pageToCheckUriPart in pageToCheckUriSplitBetweenSlashes)
-                {
-                    if (pageToCheckUriPart == currentUriPart)
-                    {
-                        return true;
-                    }
-                }
             }
         }
 

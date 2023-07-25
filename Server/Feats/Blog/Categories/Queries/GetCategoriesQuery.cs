@@ -23,6 +23,7 @@ public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQueryReque
         List<Category> categoriesDb = await context.Categories
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-        return categoriesDb.Adapt<List<CategoryDTO>>();
+        List<CategoryDTO> categories = categoriesDb.Adapt<List<CategoryDTO>>();
+        return categories;
     }
 }

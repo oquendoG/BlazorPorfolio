@@ -1,10 +1,10 @@
 ﻿using Mapster;
+using Server.Data;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
-using Server.Feats.Blog.Posts.DTOs;
 using Shared.Models.Blog;
 
-namespace Server.Extensions; 
+namespace Server.Extensions;
 
 public static class AppServiceExtensions
 {
