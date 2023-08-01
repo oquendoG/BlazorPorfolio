@@ -1,0 +1,80 @@
+﻿@using System.Net;
+@page "/admin/categorias/crear";
+
+<main class="admin-area-main">
+    <SideBar></SideBar>
+
+    <div class="admin-area-content container-fluid bg-white">
+        <div class="row g-0">
+            <div class="col">
+                <h1 class="mb-3">@(createSuccessful ? "Categoría creada correctamente" : "Crear categoría")</h1>
+                @if (attempingToCreate)
+                {
+                    <h2>Creando categoría...</h2>
+                }
+                else if (createSuccessful == false &&  attempingToCreate == false)
+                {
+                    <EditForm Model="CategoryToCreate" OnValidSubmit="CreateCategory">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-group mb-5">
+                            <label for="Name">Nombre de la categoría</label>
+                            <InputText @bind-Value="CategoryToCreate.Name" class="form-control"></InputText>
+                        </div>
+
+                        <div class="form-group mb-5">
+                            <label for="ThumbnailImage">Imágen de miniatura (jpeg or png 1920 * 1080)</label>
+                            <img src="@($"{ApiEndpoints.ServerBaseUrl}/{CategoryToCreate.ThumbnailImage}")" 
+                                    alt="miniatura" class="admin-crud-form-thumbnail-image" />
+                            <br />
+                            <InputFile class="form-control mt-4" id="thumbnailimage"></InputFile>
+                        </div>
+                        <div class="form-group mb-5">
+                            <label for="Description">Descripción</label>
+                            <InputText @bind-Value="CategoryToCreate.Description" class="form-control"></InputText>
+                        </div>
+
+                        <ValidationSummary></ValidationSummary>
+
+                        <button type="submit" class="btn btn-success d-block mt-5 md-f-size-1-5">
+                            <i class="far fa-save"></i> Crear categoría
+                        </button>
+                    </EditForm>
+                }
+                <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+@code {
+    [Inject] HttpClient HttpClient { get; set; }
+    [Inject] InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
+    private Category CategoryToCreate = new()
+    {
+        ThumbnailImage = "uploads/placeholder.jpg",
+        Posts = new List<Post>()
+    };
+    private bool attempingToCreate = false;
+    private bool attempingToCreateFailed = false;
+    private bool createSuccessful = false;
+
+    private async Task CreateCategory()
+    {
+        attempingToCreate = true;
+
+        HttpResponseMessage response = await HttpClient
+                .PostAsJsonAsync<Category>(ApiEndpoints.s_categories, CategoryToCreate);
+        if (response.StatusCode != HttpStatusCode.Created)
+        {
+            attempingToCreateFailed = true;
+            return;
+        }
+
+        Category addedCategory = await response.Content.ReadFromJsonAsync<Category>();
+        InMemoryDataBaseCache.Categories.Add(addedCategory);
+        createSuccessful = true;
+
+        attempingToCreate = false;
+    }
+}

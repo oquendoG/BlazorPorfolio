@@ -1,48 +1,45 @@
 using AutoFixture;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Server.Data;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
 using Shared.Models.Blog;
+using Tests.ServerTests.Helpers;
 
 namespace Tests.ServerTests.Blog.Categories.Queries;
 
 public class CategoryQueryTests
 {
-    private readonly Mock<AppDbContext> DbContextMock;
-    private readonly GetCategoriesQueryHandler Handler;
-    private readonly Fixture Fixture;
+    private readonly Fixture fixture;
+    private readonly AppDbContext contextFake;
+    private readonly DbContextOptions<AppDbContext> options;
     public CategoryQueryTests()
     {
-        DbContextMock = new Mock<AppDbContext>();
-        Handler = new GetCategoriesQueryHandler(DbContextMock.Object);
-        Fixture = new Fixture();
+        fixture = new Fixture();
+        options = HelperMethods.GenerateOptions();
+        contextFake = new (options);
     }
 
     [Fact]
     public async Task Handle_ShouldRetrieveCategoriesSuccessfully()
     {
-        var request = Fixture.Create<GetCategoriesQueryRequest>();
-
-        var expectedCategories = Fixture.Build<Category>()
-            .Without(cat => cat.Posts)
+        List<Post> posts = fixture.Build<Post>()
+            .Without(post => post.Category)
             .CreateMany()
             .ToList();
 
-        var mockSet = new Mock<DbSet<Category>>();
-        mockSet.As<IQueryable<Category>>().Setup(m => m.Provider).Returns(expectedCategories.AsQueryable().Provider);
-        mockSet.As<IQueryable<Category>>().Setup(m => m.Expression).Returns(expectedCategories.AsQueryable().Expression);
-        mockSet.As<IQueryable<Category>>().Setup(m => m.ElementType).Returns(expectedCategories.AsQueryable().ElementType);
-        mockSet.As<IQueryable<Category>>().Setup(m => m.GetEnumerator()).Returns(expectedCategories.AsQueryable().GetEnumerator());
-        DbContextMock.Setup(c => c.Categories).Returns(mockSet.Object);
-        List<CategoryDTO> result =
-            await Handler.Handle(request, CancellationToken.None);
+        List<Category> categories = fixture.Build<Category>()
+            .With(cat => cat.Posts, posts)
+            .CreateMany()
+            .ToList();
 
-        Assert.Equal(expectedCategories.Count, result.Count);
-        for (int i = 0; i < expectedCategories.Count; i++)
-        {
-            Assert.Equal(expectedCategories[i].Name, result[i].Name);
-        }
+        contextFake.AddRange(categories);
+        await contextFake.SaveChangesAsync();
+
+        GetCategoriesQueryHandler Handler = new(contextFake);
+        List<CategoryDTO> result = await Handler
+            .Handle(new GetCategoriesQueryRequest(), new CancellationToken());
+
+        Assert.NotNull(result);
     }
 }

@@ -1,10 +1,10 @@
-﻿@media (min-width: 992px){
-    .admin-area-sidebar{
+﻿@media (min-width: 768px){
+    .admin-area-sidebar {
         width: 200px;
     }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 767px) {
     .admin-area-sidebar {
         width: 75px;
     }

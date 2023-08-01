@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Server.Data;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
 using Shared.Models.Blog;

@@ -17,13 +17,13 @@
 .nav-link:hover,
 .nav-link:focus {
     color: rgba(0, 0, 0, 0.85);
-    border-bottom: 0.5rem solid transparent;
+    border-bottom: 0.25rem solid transparent;
     border-bottom-color: rgba(0, 0, 0, 0.4);
 }
 
 .active {
     font-size: 1.15rem;
     color: #000;
-    border-bottom: 0.5rem solid transparent;
+    border-bottom: 0.25rem solid transparent;
     border-bottom-color: #000;
 }
