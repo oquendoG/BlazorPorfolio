@@ -2,7 +2,7 @@
 using Shared.Models.Blog;
 using System.Net.Http.Json;
 
-namespace Client.Services;
+namespace Client.Shared.Services;
 
 internal sealed class InMemoryDataBaseCache
 {

@@ -12,26 +12,26 @@
                 {
                     <h2>Creando categoría...</h2>
                 }
-                else if (createSuccessful == false &&  attempingToCreate == false)
+                else if (createSuccessful == false && attempingToCreate == false)
                 {
                     <EditForm Model="CategoryToCreate" OnValidSubmit="CreateCategory">
                         <DataAnnotationsValidator />
 
                         <div class="form-group mb-5">
                             <label for="Name">Nombre de la categoría</label>
-                            <InputText @bind-Value="CategoryToCreate.Name" class="form-control"></InputText>
+                            <InputText @bind-Value="CategoryToCreate.Name" id="Name" class="form-control"></InputText>
                         </div>
 
                         <div class="form-group mb-5">
-                            <label for="ThumbnailImage">Imágen de miniatura (jpeg or png 1920 * 1080)</label>
-                            <img src="@($"{ApiEndpoints.ServerBaseUrl}/{CategoryToCreate.ThumbnailImage}")" 
-                                    alt="miniatura" class="admin-crud-form-thumbnail-image" />
+                            <label for="ThumbnailImage">Imágen de miniatura (jpg or png 1920 * 1080)</label>
+                            <img src="@($"{ApiEndpoints.ServerBaseUrl}/{CategoryToCreate.ThumbnailImage}")"
+                                 alt="miniatura" class="admin-crud-form-thumbnail-image" />
                             <br />
-                            <InputFile class="form-control mt-4" id="thumbnailimage"></InputFile>
+                            <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailimage"></InputFile>
                         </div>
                         <div class="form-group mb-5">
                             <label for="Description">Descripción</label>
-                            <InputText @bind-Value="CategoryToCreate.Description" class="form-control"></InputText>
+                            <InputText @bind-Value="CategoryToCreate.Description" id="Description" class="form-control"></InputText>
                         </div>
 
                         <ValidationSummary></ValidationSummary>
@@ -48,13 +48,16 @@
 </main>
 
 @code {
+
     [Inject] HttpClient HttpClient { get; set; }
     [Inject] InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
+
     private Category CategoryToCreate = new()
     {
-        ThumbnailImage = "uploads/placeholder.jpg",
+        ThumbnailImage = Path.Combine("uploads", "placeholder.jpg"),
         Posts = new List<Post>()
     };
+
     private bool attempingToCreate = false;
     private bool attempingToCreateFailed = false;
     private bool createSuccessful = false;
@@ -76,5 +79,55 @@
         createSuccessful = true;
 
         attempingToCreate = false;
+    }
+
+    private bool attemptingtoUploadImage = false;
+    private bool attemptToUploadFailed = false;
+    private string reasonImageUploadFailed = string.Empty;
+
+    public async Task HandleUploadedImage(InputFileChangeEventArgs e)
+    {
+        attemptingtoUploadImage = true;
+        if (e.File.ContentType != "image/jpeg" && e.File.ContentType != "image/png")
+        {
+            reasonImageUploadFailed = "Solo se admiten los formatos jpg y png";
+            attempingToCreateFailed = true;
+        }
+        else if (e.File.Size >= 32505856)
+        {
+            reasonImageUploadFailed = "Solo se admiten imágenes con tamaño menor a 30mb";
+            attempingToCreateFailed = true;
+        }
+        else
+        {
+            IBrowserFile UploadedImageFile = e.File;
+            byte[] imageAsByteArray = new byte[UploadedImageFile.Size];
+
+            await UploadedImageFile.OpenReadStream(32505856).ReadAsync(imageAsByteArray);
+            string byteString = Convert.ToBase64String(imageAsByteArray);
+
+            UploadedImage uploadedImage = new()
+            {
+                NewImageFileExtension = UploadedImageFile.Name.Substring(UploadedImageFile.Name.Length - 4),
+                NewImageBase64Content = byteString,
+                OldImagePath = string.Empty
+            };
+
+            HttpResponseMessage response = await HttpClient
+                    .PostAsJsonAsync<UploadedImage>(ApiEndpoints.s_imageUpload, uploadedImage);
+
+            if (response.StatusCode == HttpStatusCode.Created)
+            {
+                CategoryToCreate.ThumbnailImage = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                reasonImageUploadFailed = $"Algo salió mal al hacer la petición al servidor. Código {response.StatusCode}. Motivo del error: {response.ReasonPhrase}";
+                attempingToCreateFailed = true;
+            }
+
+            attemptingtoUploadImage = false;
+            StateHasChanged();
+        }
     }
 }

@@ -8,5 +8,6 @@ internal static class ApiEndpoints
     internal const string ServerBaseUrl = "https://wilsonserver.azurewebsites.net";
 #endif
 
-    internal readonly static string s_categories = $"{ServerBaseUrl}/api/categories";
+    internal readonly static string s_categories =  Path.Combine(ServerBaseUrl, "api", "categories");
+    internal readonly static string s_imageUpload = Path.Combine(ServerBaseUrl, "api", "imageupload");
 }

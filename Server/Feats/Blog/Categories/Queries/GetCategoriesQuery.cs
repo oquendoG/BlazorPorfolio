@@ -1,9 +1,9 @@
 ﻿using Mapster;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using Server.Feats.Blog.Categories.DTOs;
 using Shared.Models.Blog;
+using Microsoft.EntityFrameworkCore;
+using Server.Feats.Blog.Categories.DTOs;
 
 namespace Server.Feats.Blog.Categories.Queries;
 

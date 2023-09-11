@@ -1,5 +1,5 @@
 using Client;
-using Client.Services;
+using Client.Shared.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
