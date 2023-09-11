@@ -11,8 +11,9 @@
                 @if (attempingToCreate)
                 {
                     <h2>Creando categoría...</h2>
+                    <Loading></Loading>
                 }
-                else if (createSuccessful == false && attempingToCreate == false)
+                else if (createSuccessful is false && attempingToCreate is false)
                 {
                     <EditForm Model="CategoryToCreate" OnValidSubmit="CreateCategory">
                         <DataAnnotationsValidator />
@@ -24,6 +25,12 @@
 
                         <div class="form-group mb-5">
                             <label for="ThumbnailImage">Imágen de miniatura (jpg or png 1920 * 1080)</label>
+                            @if(attemptingtoUploadImage is true){
+                                <Loading></Loading>
+                            }else if (attemptToUploadFailed is true)
+                            {
+                                <h4 class="text-danger">Falló al cargar la imagen. @reasonImageUploadFailed</h4>
+                            }
                             <img src="@($"{ApiEndpoints.ServerBaseUrl}/{CategoryToCreate.ThumbnailImage}")"
                                  alt="miniatura" class="admin-crud-form-thumbnail-image" />
                             <br />
