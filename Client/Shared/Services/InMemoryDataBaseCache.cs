@@ -39,6 +39,16 @@ internal sealed class InMemoryDataBaseCache
         }
     }
 
+    internal async Task<Category> GetCategoryById(Guid Id)
+    {
+        if (categories is null)
+        {
+            await GetCategoriesFromDatabaseAndCache();
+        }
+
+        return Categories.FirstOrDefault(cat => cat.Id == Id);
+    }
+
     internal event Action OnCategoriesDataChanged;
     private void NotifyCategoriesDataChanged() => OnCategoriesDataChanged?.Invoke();
 }
