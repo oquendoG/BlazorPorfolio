@@ -60,6 +60,10 @@
     min-height: 90vh !important;
 }
 
+.overflow-auto {
+    overflow: auto;
+}
+
 /* 2. Backgrounds */
 .bg-lightgray {
     background-color: #EBEBEB;
@@ -84,11 +88,11 @@ body {
 
 /* 4. Components (buttons, cards etc.) */
 .btn {
-    border-radius: 0px;
+    border-radius: 0;
 }
 
 .card {
-    border-radius: 0px;
+    border-radius: 0;
 }
 
 .btn-update {
@@ -116,6 +120,10 @@ body {
 
 .hover-bg-white:hover {
     background-color: #fff;
+}
+
+.list-group {
+    border-radius: 0;
 }
 
 /* 5. Custom responsive styles */
