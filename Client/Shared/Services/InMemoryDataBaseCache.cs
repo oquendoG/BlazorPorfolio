@@ -135,10 +135,7 @@ internal sealed class InMemoryDataBaseCache
     private List<Post> posts = null;
     public List<Post> Posts
     {
-        get
-        {
-            return posts ?? (posts = new List<Post>());
-        }
+        get => posts;
         set
         {
             posts = value;

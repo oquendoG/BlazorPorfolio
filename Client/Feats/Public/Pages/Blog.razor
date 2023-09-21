@@ -33,7 +33,7 @@
         MemoryDataBaseCache.OnCategoriesDataChanged += StateHasChanged;
         if (MemoryDataBaseCache.Categories is null)
         {
-            await MemoryDataBaseCache.GetCategoriesFromDatabaseAndCache();
+            await MemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(true);
         }
     }
 

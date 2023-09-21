@@ -82,7 +82,7 @@
 
     protected async override Task OnParametersSetAsync()
     {
-        CategoryToUpdate = await InMemoryDataBaseCache.GetCategoryById(CategoryId);
+        CategoryToUpdate = await InMemoryDataBaseCache.GetCategoryById(CategoryId, false);
     }
 
     private Category CategoryToUpdate = new()
