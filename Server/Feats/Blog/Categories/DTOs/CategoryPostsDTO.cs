@@ -1,5 +1,4 @@
-﻿using Server.Feats.Blog.Posts.DTOs;
-using Shared.Models.Blog;
+﻿using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Categories.DTOs;
 

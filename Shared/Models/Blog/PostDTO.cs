@@ -1,4 +1,4 @@
-﻿namespace Server.Feats.Blog.Posts.DTOs;
+﻿namespace Shared.Models.Blog;
 
 public class PostDTO
 {

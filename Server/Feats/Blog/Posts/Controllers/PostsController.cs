@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Server.Feats.Blog.Posts.Commands;
-using Server.Feats.Blog.Posts.DTOs;
 using Server.Feats.Blog.Posts.Queries;
+using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Posts.Controllers;
 
@@ -24,6 +25,15 @@ public class PostsController : ControllerBase
     public async Task<ActionResult<List<PostDTO>>> Get()
     {
         return await mediator.Send(new GetPostsQueryRequest());
+    }
+
+    [HttpGet("dto/{id}")]
+    public async Task<IActionResult> GetDto(Guid id)
+    {
+        PostDTO post = await mediator.Send(new GetPostByIdQueryRequest(id));
+        PostDTO postDTO = post.Adapt<PostDTO>();
+
+        return Ok(postDTO);
     }
 
     [HttpGet("{id}")]

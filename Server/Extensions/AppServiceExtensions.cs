@@ -7,15 +7,20 @@ namespace Server.Extensions;
 
 public static class AppServiceExtensions
 {
-    public static void AddMediatrConfigs(this IServiceCollection services)
+    public static void AddMapsterConfigs(this IServiceCollection services)
     {
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQueryHandler).Assembly));
-
         TypeAdapterConfig<Category, CategoryPostsDTO>
             .NewConfig()
             .TwoWays()
             .MaxDepth(2)
             .Fork(config => config.Default.PreserveReference(true));
+
+        services.AddSingleton(sp => TypeAdapterConfig.GlobalSettings);
+    }
+
+    public static void AddMediatrConfigs(this IServiceCollection services)
+    {
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetCategoriesQueryHandler).Assembly));
     }
 
     public static void ConfigureCors(this IServiceCollection services)

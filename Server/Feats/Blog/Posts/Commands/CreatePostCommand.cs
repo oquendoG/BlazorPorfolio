@@ -1,7 +1,6 @@
 ﻿using Mapster;
 using MediatR;
 using Server.Data;
-using Server.Feats.Blog.Posts.DTOs;
 using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Posts.Commands;

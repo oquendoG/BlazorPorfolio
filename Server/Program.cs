@@ -18,6 +18,7 @@ builder.Logging.AddSerilog(loggger);
 builder.Services.AddDbContext<AppDbContext>(options => options
                 .UseSqlite(builder.Configuration.GetConnectionString("conexion")));
 
+builder.Services.AddMapsterConfigs();
 builder.Services.AddMediatrConfigs();
 builder.Services.ConfigureCors();
 

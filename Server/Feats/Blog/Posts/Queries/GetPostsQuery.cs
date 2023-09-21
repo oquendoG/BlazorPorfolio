@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using Server.Feats.Blog.Posts.DTOs;
 using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Posts.Queries;
