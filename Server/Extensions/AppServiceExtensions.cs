@@ -9,11 +9,25 @@ public static class AppServiceExtensions
 {
     public static void AddMapsterConfigs(this IServiceCollection services)
     {
-        TypeAdapterConfig<Category, CategoryPostsDTO>
-            .NewConfig()
+        TypeAdapterConfig<CategoryPostsDTO, Category>.NewConfig()
             .TwoWays()
             .MaxDepth(2)
-            .Fork(config => config.Default.PreserveReference(true));
+            .PreserveReference(true);
+
+        TypeAdapterConfig<PostDTO, Post>.NewConfig()
+            .TwoWays()
+            .PreserveReference(true);
+
+        TypeAdapterConfig<List<CategoryPostsDTO>, List<Category>>
+            .NewConfig()
+            .MaxDepth(2)
+            .PreserveReference(true);
+
+        TypeAdapterConfig<List<PostDTO>, List<Post>>
+            .NewConfig()
+            .MaxDepth(2)
+            .TwoWays()
+            .PreserveReference(true);
 
         services.AddSingleton(sp => TypeAdapterConfig.GlobalSettings);
     }

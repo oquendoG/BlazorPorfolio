@@ -20,10 +20,10 @@ public class GetCategoriesWithPostsQueryHandler : IRequestHandler<GetCategoriesW
     public async Task<List<CategoryPostsDTO>> Handle(GetCategoriesWithPostsQueryRequest request, CancellationToken cancellationToken)
     {
         List<Category> categoriesDb = await dbContext.Categories
-            .AsNoTracking()
             .Include(category => category.Posts)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
-        List<CategoryPostsDTO> categories = categoriesDb.Adapt<List<Category>, List<CategoryPostsDTO>>();
+        List<CategoryPostsDTO> categories = categoriesDb.Adapt<List<CategoryPostsDTO>>();
         return categories;
     }
 }
