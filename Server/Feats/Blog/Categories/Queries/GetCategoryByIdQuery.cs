@@ -40,6 +40,8 @@ public class GetCategoryByIdQueryhandler : IRequestHandler<GetCategoryByIdQueryR
             return new CategoryPostsDTO();
         }
 
-        return category.Adapt<CategoryPostsDTO>();
+        CategoryPostsDTO categoryDto = category.Adapt<CategoryPostsDTO>();
+
+        return categoryDto;
     }
 }

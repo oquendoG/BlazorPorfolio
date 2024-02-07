@@ -1,4 +1,4 @@
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -6,99 +6,115 @@ using Server.Data;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
 using Shared.Models.Blog;
-using Tests.Configurations;
 using Tests.ServerTests.Helpers;
 
 namespace Tests.ServerTests.Blog.Categories.Queries;
-
 public class CategoryQueryTests
 {
+
+    private readonly DbContextOptions<AppDbContext> dbContextOptions;
     private readonly Fixture fixture;
     private readonly AppDbContext contextFake;
-    private readonly TypeAdapterConfig config;
-    private readonly DbContextOptions<AppDbContext> options;
-    private readonly (List<Category>, List<Post>) dataGenerated;
-    private List<Category> receivedCategories;
+    private List<Category> categories = new();
+    private readonly List<Category> generatedCategoriesWithoutPosts = new();
+    private readonly List<Category> generatedCategoriesWithPosts = new();
 
     public CategoryQueryTests()
     {
-        config = Configuration.MapsterConfigurationForCategory();
         fixture = new Fixture();
-        options = HelperMethods.GenerateOptions();
-        contextFake = new(options);
-        dataGenerated = CreateTestData();
+        dbContextOptions = HelperMethods.GenerateOptions();
+        contextFake = new(dbContextOptions);
+        generatedCategoriesWithoutPosts = CreateTestDataForCategoriesWithoutPosts();
+        generatedCategoriesWithPosts = CreateTestDataForCategoriesWithPosts();
     }
 
-
-    [Fact]
-    public async Task Handle_ShouldRetrieveCategoriesSuccessfully()
+    private List<Category> CreateTestDataForCategoriesWithoutPosts()
     {
-        receivedCategories = await GetDataFromDataBaseAsync();
-        receivedCategories.Should().NotBeNullOrEmpty();
-    }
-
-    [Fact]
-    public async Task Handle_ShouldRetrieveSameCount()
-    {
-        receivedCategories = await GetDataFromDataBaseAsync();
-        receivedCategories.Should().HaveCount(dataGenerated.Item1.Count);
-    }
-
-    [Fact]
-    public async Task Handle_ShoudRetrieveCategoriesWithPosts()
-    {
-        receivedCategories = await GetDataFromDataBaseAsync();
-        //To avoid cyclic redundancy
-        List<Post> postsWithoutCategories =
-            receivedCategories
-            .SelectMany(cat => cat.Posts
-                .Select(post => new Post()
-                {
-                    Id = post.Id,
-                    Title = post.Title,
-                    Excerpt = post.Excerpt,
-                    Thumbnailimage = post.Thumbnailimage,
-                    Content = post.Content,
-                    PublishDate = post.PublishDate,
-                    Published = post.Published,
-                    Author = post.Author,   
-                    CategoryId = post.CategoryId
-                }))
-            .ToList();
-
-        receivedCategories[2].Posts.Should().BeEquivalentTo(postsWithoutCategories);
-    }
-
-    private (List<Category>, List<Post>) CreateTestData()
-    {
-        List<Post> posts = fixture.Build<Post>()
-           .Without(post => post.Category)
-           .CreateMany(3)
-           .ToList();
-
-        contextFake.AddRange(posts);
-        contextFake.SaveChanges();
-
         List<Category> categories = fixture.Build<Category>()
-            .With(cat => cat.Posts, posts)
-            .CreateMany(3)
+            .Without(cat => cat.Posts)
+            .CreateMany(5)
             .ToList();
 
         contextFake.AddRange(categories);
         contextFake.SaveChanges();
 
-        return (categories, posts);
+        return categories;
     }
 
-    private async Task<List<Category>> GetDataFromDataBaseAsync()
+    private List<Category> CreateTestDataForCategoriesWithPosts()
     {
-        GetCategoriesWithPostsQueryHandler Handler = new(contextFake);
-        List<CategoryPostsDTO> result = await Handler
-            .Handle(new GetCategoriesWithPostsQueryRequest(), new CancellationToken());
+        List<Post> posts = fixture.Build<Post>()
+            .Without(post => post.Category)
+            .CreateMany(5)
+            .ToList();
+
+        List<Category> categories = fixture.Build<Category>()
+            .With(cat => cat.Posts, posts)
+            .CreateMany(5)
+            .ToList();
+
+        contextFake.AddRange(categories);
+        contextFake.SaveChanges();
+
+        return categories;
+    }
+
+    [Fact]
+    public async Task Handle_ShouldRetieveCategoriesSuccesfully()
+    {
+        categories = await GetDataFromDataBase();
+        categories.Should().NotBeNullOrEmpty();
+
+    }
+
+    private async Task<List<Category>> GetDataFromDataBase()
+    {
+        GetCategoriesQueryHandler Handler = new(contextFake);
+        List<CategoryDTO> result = await Handler
+            .Handle(new GetCategoriesQueryRequest(), new CancellationToken());
 
         List<Category> receivedCategories = result
-            .Adapt<List<CategoryPostsDTO>, List<Category>>(config);
+            .Adapt<List<CategoryDTO>, List<Category>>();
 
         return receivedCategories;
+    }
+
+    [Fact]
+    public async Task Handle_ShouldRetrieveCategoryById()
+    {
+        GetCategoryByIdQueryhandler Handler = new(contextFake);
+        CategoryPostsDTO result = await Handler
+            .Handle(new GetCategoryByIdQueryRequest(generatedCategoriesWithoutPosts[0].Id, false), new CancellationToken());
+
+        Category receivedCategory = result
+            .Adapt<CategoryPostsDTO, Category>();
+
+        receivedCategory.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Handle_ShouldRetrieveCategoryByIdWithPosts()
+    {
+        GetCategoryByIdQueryhandler Handler = new(contextFake);
+        CategoryPostsDTO result = await Handler
+            .Handle(new GetCategoryByIdQueryRequest(
+                generatedCategoriesWithPosts[^1].Id, true), 
+                new CancellationToken());
+
+        Category receivedCategory = result
+            .Adapt<CategoryPostsDTO, Category>();
+
+        //This for avoiding cyclic references
+        foreach (var cat in generatedCategoriesWithPosts)
+        {
+            foreach (var post in cat.Posts)
+            {
+                post.Category = null;
+            }
+        }
+
+        //this code for checking just the last one because of AsNotracking in handler
+        receivedCategory.Should()
+            .BeEquivalentTo(generatedCategoriesWithPosts[^1]);
     }
 }
