@@ -13,7 +13,7 @@ using System.Net;
 using Tests.ServerTests.Helpers;
 
 namespace Tests.ServerTests.Blog.Categories.Controllers;
-public class CategoryControllerTests
+public class CategoryControllerCreateTests
 {
     private readonly CategoriesController categoriesController;
     private readonly Mock<IMediator> mediatorMoq;
@@ -22,7 +22,7 @@ public class CategoryControllerTests
     public readonly AppDbContext contextFake;
     private readonly Fixture fixture;
 
-    public CategoryControllerTests()
+    public CategoryControllerCreateTests()
     {
         fixture = new();
         mediatorMoq = new();

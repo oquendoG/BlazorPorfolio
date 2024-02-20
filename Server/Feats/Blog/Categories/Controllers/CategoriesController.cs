@@ -99,7 +99,7 @@ public class CategoriesController : ControllerBase
             return StatusCode(500, "Ha hábido una excepción por favor comuniquese con el administrador del sistema o mire los logs");
         }
 
-        return Ok("Actualizado correctamente");
+        return Ok(category);
     }
 
     [HttpDelete("{id}")]
@@ -128,7 +128,7 @@ public class CategoriesController : ControllerBase
             return StatusCode(500, "Ha hábido una excepción por favor comuniquese con el administrador del sistema o mire los logs");
         }
 
-        return Ok(result);
+        return Ok(categoryDb);
     }
     #endregion
 }
