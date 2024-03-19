@@ -16,12 +16,11 @@ namespace Tests.ServerTests.Blog.Categories.Controllers;
 public class CategoryControllerCreateTests
 {
     private readonly CategoriesController categoriesController;
-    private readonly Mock<IMediator> mediatorMoq;
-    private readonly Mock<IWebHostEnvironment> hostEnvironmentMoq;
-    private readonly DbContextOptions<AppDbContext> options;
     public readonly AppDbContext contextFake;
     private readonly Fixture fixture;
-
+    private readonly Mock<IWebHostEnvironment> hostEnvironmentMoq;
+    private readonly Mock<IMediator> mediatorMoq;
+    private readonly DbContextOptions<AppDbContext> options;
     public CategoryControllerCreateTests()
     {
         fixture = new();
@@ -33,7 +32,7 @@ public class CategoryControllerCreateTests
     }
 
     [Fact]
-    public async Task Controller_ModelState_ShouldReturnBadRequest()
+    public async Task ShouldReturnBadRequest_WhenModelIsInvalid()
     {
         CategoryDTO? category = new()
         {
@@ -52,7 +51,7 @@ public class CategoryControllerCreateTests
     }
 
     [Fact]
-    public async Task Controller_ShouldNotBeNull()
+    public async Task ShouldRetunBadRequest_WhenCategoryIsNull()
     {
         CategoryDTO? category = null;
 
@@ -62,12 +61,12 @@ public class CategoryControllerCreateTests
     }
 
     [Fact]
-    public async Task Controller_ModelState_ShouldReturn500Error()
+    public async Task ShouldReturn500Error_WhenModelStateIsInvalid()
     {
         CategoryDTO? category = new();
         categoriesController.StatusCode(500);
 
-        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<CreateCategoryCommandRequest>(), default))
+        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<CreateCategoryCommandRequest>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(0);
 
 
@@ -77,12 +76,12 @@ public class CategoryControllerCreateTests
     }
 
     [Fact]
-    public async Task Controller_ShouldReturnCreated()
+    public async Task ShouldReturnCreated_WhenModelisValid()
     {
         CategoryDTO? category = fixture.Create<CategoryDTO>();
         categoriesController.StatusCode(201);
 
-        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<CreateCategoryCommandRequest>(), default))
+        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<CreateCategoryCommandRequest>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(1);
 
 

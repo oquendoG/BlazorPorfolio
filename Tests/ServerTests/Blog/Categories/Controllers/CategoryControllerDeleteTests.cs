@@ -18,20 +18,20 @@ using Tests.ServerTests.Helpers;
 namespace Tests.ServerTests.Blog.Categories.Controllers;
 public class CategoryControllerDeleteTests
 {
-    private readonly CategoriesController categoriesController;
-    private readonly Mock<IMediator> mediatorMoq;
-    private readonly Mock<IWebHostEnvironment> hostEnvironmentMoq;
-    private readonly DbContextOptions<AppDbContext> options;
     public readonly AppDbContext contextFake;
+    private readonly CategoriesController categoriesController;
     private readonly Fixture fixture;
+    private readonly Mock<IWebHostEnvironment> hostEnvironmentMoq;
+    private readonly Mock<IMediator> mediatorMoq;
+    private readonly DbContextOptions<AppDbContext> options;
 
     public CategoryControllerDeleteTests()
     {
-        fixture = new();
-        mediatorMoq = new();
-        hostEnvironmentMoq = new();
         options = HelperMethods.GenerateOptions();
         contextFake = new(options);
+        fixture = new();
+        hostEnvironmentMoq = new();
+        mediatorMoq = new();
         categoriesController = new(mediatorMoq.Object, hostEnvironmentMoq.Object);
     }
 
@@ -71,10 +71,10 @@ public class CategoryControllerDeleteTests
 
         CategoryPostsDTO categoryPosts = categoryToDb.Adapt<CategoryPostsDTO>();
         GetCategoryByIdQueryRequest request = new(categoryToDb.Id, false);
-        mediatorMoq.Setup(mediator => mediator.Send(request, default))
+        mediatorMoq.Setup(mediator => mediator.Send(request, It.IsAny<CancellationToken>()))
                   .ReturnsAsync(categoryPosts);
 
-        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<DeleteCategoryCommandRequest>(), default))
+        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<DeleteCategoryCommandRequest>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(0);
 
         IActionResult result = await categoriesController.Delete(categoryToDb.Id)!;
@@ -112,10 +112,10 @@ public class CategoryControllerDeleteTests
 
         CategoryPostsDTO categoryPosts = categoryToDb.Adapt<CategoryPostsDTO>();
         GetCategoryByIdQueryRequest request = new(categoryToDb.Id, false);
-        mediatorMoq.Setup(mediator => mediator.Send(request, default))
+        mediatorMoq.Setup(mediator => mediator.Send(request, It.IsAny<CancellationToken>()))
                   .ReturnsAsync(categoryPosts);
 
-        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<DeleteCategoryCommandRequest>(), default))
+        mediatorMoq.Setup(mediator => mediator.Send(It.IsAny<DeleteCategoryCommandRequest>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(1);
 
         IActionResult result = await categoriesController.Delete(categoryToDb.Id)!;

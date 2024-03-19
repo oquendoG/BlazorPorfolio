@@ -19,24 +19,24 @@ namespace Tests.ServerTests.Blog.Categories.Controllers;
 public class CategoryControllerUpdateTests
 {
     private readonly CategoriesController categoriesController;
-    private readonly Mock<IMediator> mediatorMoq;
-    private readonly Mock<IWebHostEnvironment> hostEnvironmentMoq;
-    private readonly DbContextOptions<AppDbContext> options;
     public readonly AppDbContext contextFake;
     private readonly Fixture fixture;
+    private readonly Mock<IWebHostEnvironment> hostEnvironmentMoq;
+    private readonly Mock<IMediator> mediatorMoq;
+    private readonly DbContextOptions<AppDbContext> options;
 
     public CategoryControllerUpdateTests()
     {
         fixture = new();
-        mediatorMoq = new();
         hostEnvironmentMoq = new();
+        mediatorMoq = new();
         options = HelperMethods.GenerateOptions();
         contextFake = new(options);
         categoriesController = new(mediatorMoq.Object, hostEnvironmentMoq.Object);
     }
 
     [Fact]
-    public async Task Controller_ModelState_ShouldReturnBadRequest()
+    public async Task ShouldReturnBadRequest_WhenModelStateIsInvalid()
     {
         CategoryDTO? category = new()
         {
@@ -56,7 +56,7 @@ public class CategoryControllerUpdateTests
     }
 
     [Fact]
-    public async Task Controller_ShouldNotBeNull()
+    public async Task ShouldReturnBadRequest_WhenModelIsInvalid()
     {
         CategoryDTO? category = null;
         Guid id = Guid.Empty;
@@ -67,25 +67,25 @@ public class CategoryControllerUpdateTests
     }
 
     [Fact]
-    public async Task Controller_ShouldCheckCategoryNotExists()
+    public async Task ShouldReturnNotFound_WhenCategoryDoesNotExists()
     {
         CategoryDTO? category = fixture.Create<CategoryDTO>();
 
-        mediatorMoq.Setup(med => med.Send(It.IsAny<CheckIfCategoryExistsQueryRequest>(), default))
+        mediatorMoq.Setup(med => med.Send(It.IsAny<CheckIfCategoryExistsQueryRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
-        var result = await categoriesController.Update(category.Id, category);
+        IActionResult result = await categoriesController.Update(category.Id, category);
 
         result.Should().BeOfType<NotFoundObjectResult>();
     }
 
     [Fact]
-    public async Task Controller_ModelState_ShouldReturn500Error()
+    public async Task ShouldReturn500Error_WhenModelIsInvalid()
     {
         CategoryDTO? category = new();
         categoriesController.StatusCode(500);
 
-        mediatorMoq.Setup(med => med.Send(It.IsAny<UpdateCategoryCommandRequest>(), default))
+        mediatorMoq.Setup(med => med.Send(It.IsAny<UpdateCategoryCommandRequest>(), It.IsAny<CancellationToken>()))
                   .ReturnsAsync(0);
 
 
@@ -95,7 +95,7 @@ public class CategoryControllerUpdateTests
     }
 
     [Fact]
-    public async Task Controller_ShouldReturnOK()
+    public async Task ShouldReturnOK_WhenModelIsValid()
     {
         CategoryDTO? category = fixture.Create<CategoryDTO>();
         Category categorytoDb = category.Adapt<Category>();
@@ -112,12 +112,14 @@ public class CategoryControllerUpdateTests
         mediatorMoq.Setup(mediator => mediator.Send(request, default))
                   .ReturnsAsync(1);
 
-        mediatorMoq.Setup(med => med.Send(It.IsAny<CheckIfCategoryExistsQueryRequest>(), default))
+        mediatorMoq.Setup(med => med.Send(It.IsAny<CheckIfCategoryExistsQueryRequest>(), It.IsAny<CancellationToken>()))
            .ReturnsAsync(true);
 
         categoriesController.StatusCode(200);
+
         IActionResult result = await categoriesController.Update(categorytoDb.Id, categoryToUpdate)!;
         ObjectResult? objectResult = (result as ObjectResult)!;
+
         objectResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
         objectResult.Value.Should().BeSameAs(categoryToUpdate);
     }

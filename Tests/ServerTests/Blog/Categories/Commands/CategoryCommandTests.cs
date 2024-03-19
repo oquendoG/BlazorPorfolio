@@ -15,27 +15,27 @@ namespace Tests.ServerTests.Blog.Categories.Commands;
 
 public class CategoryCommandTests
 {
-    private readonly Fixture fixture;
-    private readonly Mock<ILogger<CreateCategoryCommandHandler>> loggerCreate;
-    private readonly Mock<ILogger<UpdateCategoryCommandHandler>> loggerUpdate;
-    private readonly Mock<ILogger<DeleteCategoryCommandHandler>> loggerDelete;
-    private readonly Mock<IMediator> mediatorMoq;
-    private readonly DbContextOptions<AppDbContext> options;
     public readonly AppDbContext contextFake;
     public readonly Mock<AppDbContext> contextMock;
     public readonly FaultyDbContext faultyDbContext;
+    private readonly Fixture fixture;
+    private readonly Mock<ILogger<CreateCategoryCommandHandler>> loggerCreate;
+    private readonly Mock<ILogger<DeleteCategoryCommandHandler>> loggerDelete;
+    private readonly Mock<ILogger<UpdateCategoryCommandHandler>> loggerUpdate;
+    private readonly Mock<IMediator> mediatorMoq;
+    private readonly DbContextOptions<AppDbContext> options;
 
     public CategoryCommandTests()
     {
+        options = HelperMethods.GenerateOptions();
+        contextFake = new(options);
+        contextMock = new(options);
+        faultyDbContext = new(options);
         fixture = new();
         loggerCreate = new();
         loggerUpdate = new();
         loggerDelete = new();
         mediatorMoq = new();
-        options = HelperMethods.GenerateOptions();
-        contextFake = new(options);
-        contextMock = new(options);
-        faultyDbContext = new(options);
     }
 
 
@@ -104,14 +104,14 @@ public class CategoryCommandTests
     }
 
     [Fact]
-    public async Task ShouldReturnZero_WhenCategroyDoesntExit()
+    public async Task ShouldReturnZero_WhenCategoryDoesntExit()
     {
         _ = await AddCategoryToDb();
 
         CategoryDTO? category = fixture.Create<CategoryDTO>();
 
         UpdateCategoryCommandHandler handler = new(contextFake, loggerUpdate.Object);
-        int result = await handler.Handle(new UpdateCategoryCommandRequest(category), default);
+        int result = await handler.Handle(new UpdateCategoryCommandRequest(category), It.IsAny<CancellationToken>());
 
         result.Should().Be(0);
     }
@@ -121,7 +121,7 @@ public class CategoryCommandTests
     {
         faultyDbContext.Database.EnsureCreated();
 
-        var category = faultyDbContext.Categories.First();
+        Category? category = faultyDbContext.Categories.First();
 
         CategoryDTO categoryDTO = category.Adapt<CategoryDTO>();
 
@@ -139,7 +139,7 @@ public class CategoryCommandTests
 
         CategoryPostsDTO category = await CreateEntitytoDeleteDetached();
         DeleteCategoryCommandHandler handler = new(contextFake, loggerDelete.Object);
-        int result = await handler.Handle(new DeleteCategoryCommandRequest(category), default);
+        int result = await handler.Handle(new DeleteCategoryCommandRequest(category), It.IsAny<CancellationToken>());
 
         result.Should().Be(1);
     }
@@ -166,7 +166,7 @@ public class CategoryCommandTests
 
         CategoryPostsDTO category = categoryDb.Adapt<CategoryPostsDTO>();
         DeleteCategoryCommandHandler handler = new(faultyDbContext, loggerDelete.Object);
-        int result = await handler.Handle(new DeleteCategoryCommandRequest(category), default);
+        int result = await handler.Handle(new DeleteCategoryCommandRequest(category), It.IsAny<CancellationToken>());
 
         result.Should().Be(0);
     }

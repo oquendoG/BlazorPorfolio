@@ -12,18 +12,18 @@ namespace Tests.ServerTests.Blog.Categories.Queries;
 public class CategoryQueryTests
 {
 
+    private readonly AppDbContext contextFake;
     private readonly DbContextOptions<AppDbContext> dbContextOptions;
     private readonly Fixture fixture;
-    private readonly AppDbContext contextFake;
-    private List<Category> categories = new();
-    private readonly List<Category> generatedCategoriesWithoutPosts = new();
-    private readonly List<Category> generatedCategoriesWithPosts = new();
+    private List<Category> categories = [];
+    private readonly List<Category> generatedCategoriesWithoutPosts = [];
+    private readonly List<Category> generatedCategoriesWithPosts = [];
 
     public CategoryQueryTests()
     {
-        fixture = new Fixture();
         dbContextOptions = HelperMethods.GenerateOptions();
         contextFake = new(dbContextOptions);
+        fixture = new Fixture();
         generatedCategoriesWithoutPosts = CreateTestDataForCategoriesWithoutPosts();
         generatedCategoriesWithPosts = CreateTestDataForCategoriesWithPosts();
     }

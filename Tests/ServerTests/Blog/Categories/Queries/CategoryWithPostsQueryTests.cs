@@ -13,19 +13,19 @@ namespace Tests.ServerTests.Blog.Categories.Queries;
 
 public class CategoryWithPostsQueryTests
 {
-    private readonly Fixture fixture;
-    private readonly AppDbContext contextFake;
     private readonly TypeAdapterConfig config;
-    private readonly DbContextOptions<AppDbContext> options;
+    private readonly AppDbContext contextFake;
     private readonly (List<Category>, List<Post>) dataGenerated;
-    private List<Category> receivedCategories = new();
+    private readonly Fixture fixture;
+    private readonly DbContextOptions<AppDbContext> options;
+    private List<Category> receivedCategories = [];
 
     public CategoryWithPostsQueryTests()
     {
         config = Configuration.MapsterConfigurationForCategory();
-        fixture = new Fixture();
         options = HelperMethods.GenerateOptions();
         contextFake = new(options);
+        fixture = new Fixture();
         dataGenerated = CreateTestData();
     }
 
@@ -50,8 +50,7 @@ public class CategoryWithPostsQueryTests
         receivedCategories = await GetDataFromDataBaseAsync();
         //To avoid cyclic redundancy
         List<Post> postsWithoutCategories =
-            receivedCategories
-            .SelectMany(cat => cat.Posts
+            receivedCategories.SelectMany(cat => cat.Posts
                 .Select(post => new Post()
                 {
                     Id = post.Id,
@@ -66,7 +65,7 @@ public class CategoryWithPostsQueryTests
                 }))
             .ToList();
 
-        /*the last one because of AsNotracking(), AsNoTracking for some reason works well
+        /*Selected the last one because of AsNotracking(), AsNoTracking for some reason works well
         in production but not in tests*/
         receivedCategories[2].Posts.Should().BeEquivalentTo(postsWithoutCategories);
     }
