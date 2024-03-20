@@ -27,4 +27,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ServerTests\Blog\Posts\Commands\" />
+    <Folder Include="ServerTests\Blog\Posts\Controllers\" />
+  </ItemGroup>
 </Project>
