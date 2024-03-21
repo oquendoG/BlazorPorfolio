@@ -142,11 +142,11 @@
             string byteString = Convert.ToBase64String(imageAsByteArray);
 
             UploadedImage uploadedImage = new()
-                {
-                    NewImageFileExtension = UploadedImageFile.Name.Substring(UploadedImageFile.Name.Length - 4),
-                    NewImageBase64Content = byteString,
-                    OldImagePath = string.Empty
-                };
+            {
+                NewImageFileExtension = UploadedImageFile.Name.Substring(UploadedImageFile.Name.Length - 4),
+                NewImageBase64Content = byteString,
+                OldImagePath = string.Empty
+            };
 
             HttpResponseMessage response = await HttpClient
                     .PostAsJsonAsync<UploadedImage>(ApiEndpoints.s_imageUpload, uploadedImage);

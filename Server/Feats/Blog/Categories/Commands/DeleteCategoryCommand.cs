@@ -27,7 +27,7 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Se ha producido una excepción al crear la categoría");
+            logger.LogError(ex, "Se ha producido una excepción al eliminar la categoría");
             return 0;
         }
     }

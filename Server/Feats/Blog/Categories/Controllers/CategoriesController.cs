@@ -118,8 +118,11 @@ public class CategoriesController : ControllerBase
 
         if (categoryDb.ThumbnailImage != "uploads/placeholder.jpg")
         {
-            string filename = categoryDb.ThumbnailImage.Split('/').Last();
-            System.IO.File.Delete($"{hostEnvironment.ContentRootPath}\\wwwroot\\uploads{filename}");
+            string filename = categoryDb.ThumbnailImage.Split(@"\").Last();
+            System.IO.File
+                .Delete(
+                    Path.Combine(hostEnvironment.ContentRootPath, "wwwroot", "uploads", filename)
+                );
         }
 
         int result = await mediator.Send(new DeleteCategoryCommandRequest(categoryDb));
