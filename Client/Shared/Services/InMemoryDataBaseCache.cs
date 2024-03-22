@@ -162,7 +162,7 @@ internal sealed class InMemoryDataBaseCache
     }
 
     private bool gettingPostsFromDatabaseAndCaching = false;
-    internal async Task GetPostsFromDatabaseAndCache()
+    public async Task GetPostsFromDatabaseAndCache()
     {
         if (gettingPostsFromDatabaseAndCaching)
         {
