@@ -1,14 +1,13 @@
-﻿using Mapster;
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Shared.Models.Blog;
 
 namespace Server.Feats.Blog.Posts.Queries;
 
-public record GetPostsQueryRequest : IRequest<List<PostDTO>>;
+public record GetPostsQueryRequest : IRequest<List<Post>>;
 
-public class GetPostsQueryHandler : IRequestHandler<GetPostsQueryRequest, List<PostDTO>>
+public class GetPostsQueryHandler : IRequestHandler<GetPostsQueryRequest, List<Post>>
 {
     private readonly AppDbContext context;
 
@@ -16,12 +15,13 @@ public class GetPostsQueryHandler : IRequestHandler<GetPostsQueryRequest, List<P
     {
         this.context = context;
     }
-    public async Task<List<PostDTO>> Handle(GetPostsQueryRequest request, CancellationToken cancellationToken)
+    public async Task<List<Post>> Handle(GetPostsQueryRequest request, CancellationToken cancellationToken)
     {
-        IEnumerable<Post> postsdb = await context.Posts
+        List<Post> postsdb = await context.Posts
+             .Include(post => post.Category)
              .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        return postsdb.Adapt<List<PostDTO>>();
+        return postsdb;
     }
 }

@@ -30,7 +30,7 @@ public class PostsQueryTests
             .ToList();
 
         contextFake.AddRange(posts);
-        await contextFake.SaveChangesAsync();
+        int result = await contextFake.SaveChangesAsync();
 
         return posts;
     }
@@ -38,15 +38,37 @@ public class PostsQueryTests
     [Fact]
     public async Task ShouldReturnPosts_WhenFound()
     {
-        _ = await CreateTestPosts();
+        _ = await CreateTestPostsWithCategories();
 
         GetPostsQueryHandler handler = new(contextFake);
 
-        List<PostDTO> posts = await handler
-            .Handle(It.IsAny<GetPostsQueryRequest>(), It.IsAny<CancellationToken>());
+        List<Post> posts = await handler
+            .Handle(new GetPostsQueryRequest(), It.IsAny<CancellationToken>());
 
         posts.Should().NotBeEmpty();
         posts.Should().HaveCount(5);
+    }
+
+    private async Task<List<Post>> CreateTestPostsWithCategories()
+    {
+        Category category = fixture
+            .Build<Category>()
+            .Without(cat => cat.Posts)
+            .Create();
+
+        contextFake.Add(category);
+        await contextFake.SaveChangesAsync();
+
+        List<Post> posts = fixture
+            .Build<Post>()
+            .With(post=> post.Category, category)
+            .CreateMany(5)
+            .ToList();
+
+        contextFake.AddRange(posts);
+        await contextFake.SaveChangesAsync();
+
+        return posts;
     }
 
     [Fact]

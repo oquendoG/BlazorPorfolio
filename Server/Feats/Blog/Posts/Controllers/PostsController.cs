@@ -22,7 +22,7 @@ public class PostsController : ControllerBase
 
     #region CrudOperations
     [HttpGet]
-    public async Task<ActionResult<List<PostDTO>>> Get()
+    public async Task<ActionResult<List<Post>>> Get()
     {
         return await mediator.Send(new GetPostsQueryRequest());
     }
