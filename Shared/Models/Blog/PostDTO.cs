@@ -12,7 +12,7 @@ public class PostDTO
 
     public string Content { get; set; }
 
-    public string PublishDate { get; set; }
+    public string PublishDate { get; set; } = "Aun no se ha publicado";
 
     public bool Published { get; set; }
 

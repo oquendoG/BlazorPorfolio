@@ -2,48 +2,71 @@
 
 <main class="admin-area-main">
 
-	<SideBar></SideBar>
+    <SideBar></SideBar>
 
-	<div class="admin-area-content container-fluid bg-white">
-		<div class="row g-0">
-			<div class="col">
-				<h1 class="mb-3">Descripción general</h1>
-				<hr class="mb-3" />
+    <div class="admin-area-content container-fluid bg-white">
+        <div class="row g-0">
+            <div class="col">
+                <h1 class="mb-3">Descripción general</h1>
+                <hr class="mb-3" />
 
-				<div class="row">
-					<div class="col-lg-4 p-3 md-and-smaller-my-3">
-						<div class="card shadow">
-							<a href="/admin/categorias" class="stretched-link text-white">
-								<img src="assets/img/admincards/categories-card-background.jpg" class="card-img" alt="Overview categories card background" />
-								<div class="card-img-overlay d-flex flex-column">
-									<h2 class="card-title fw-semibold">Categorias</h2>
-									<h5 class="card-text">Existen 3 categorías</h5>
+                @if (inMemoryDataBaseCache.Categories is null || inMemoryDataBaseCache.Posts is null)
+                {
+                    <Loading></Loading>
+                }
+                else
+                {
+                    <div class="row">
+                        <div class="col-lg-4 p-3 md-and-smaller-my-3">
+                            <div class="card shadow">
+                                <a href="/admin/categorias" class="stretched-link text-white">
+                                    <img src="assets/img/admincards/categories-card-background.jpg" class="card-img" alt="Overview categories card background" />
+                                    <div class="card-img-overlay d-flex flex-column">
+                                        <h2 class="card-title fw-semibold">Categorias</h2>
+                                        <h5 class="card-text">Existen @inMemoryDataBaseCache.Categories.Count categorías</h5>
 
-									<div class="d-flex align-items-end justify-content-end flex-grow-1">
-										<i class="fas fa-arrow-right ms-4 h2"></i>
-									</div>
-								</div>
-							</a>
-						</div>
-					</div>
+                                        <div class="d-flex align-items-end justify-content-end flex-grow-1">
+                                            <i class="fas fa-arrow-right ms-4 h2"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
 
-					<div class="col-lg-4 p-3 md-and-smaller-my-3">
-						<div class="card shadow">
-							<a href="/admin/posts" class="stretched-link text-white">
-								<img src="assets/img/admincards/posts-card-background.jpg" class="card-img" alt="Overview categories card background" />
-								<div class="card-img-overlay d-flex flex-column">
-									<h2 class="card-title fw-semibold">Posts</h2>
-									<h5 class="card-text">Existen 6 posts.</h5>
+                        <div class="col-lg-4 p-3 md-and-smaller-my-3">
+                            <div class="card shadow">
+                                <a href="/admin/posts" class="stretched-link text-white">
+                                    <img src="assets/img/admincards/posts-card-background.jpg" class="card-img" alt="Overview categories card background" />
+                                    <div class="card-img-overlay d-flex flex-column">
+                                        <h2 class="card-title fw-semibold">Posts</h2>
+                                        <h5 class="card-text">Existen @inMemoryDataBaseCache.Posts.Count posts.</h5>
 
-									<div class="d-flex align-items-end justify-content-end flex-grow-1">
-										<i class="fas fa-arrow-right ms-4 h2"></i>
-									</div>
-								</div>
-							</a>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                                        <div class="d-flex align-items-end justify-content-end flex-grow-1">
+                                            <i class="fas fa-arrow-right ms-4 h2"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </main>
+
+@code {
+
+    [Inject]
+    InMemoryDataBaseCache inMemoryDataBaseCache { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (inMemoryDataBaseCache.Categories == null)
+        {
+            await inMemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(true);
+        }
+
+
+    }
+}
