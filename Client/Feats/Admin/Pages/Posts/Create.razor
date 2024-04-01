@@ -66,9 +66,9 @@
 							<InputText @bind-Value="postToCreate.Excerpt" class="form-control" id="postExcerpt"></InputText>
 						</div>
 
-						<div class="form-group mb-5">
-							<label for="postContent">Contenido del post</label>
-							<InputText @bind-Value="postToCreate.Content" class="form-control" id="postContent"></InputText>
+						<div class="form-group mb-5 flex-shrink-1">
+							<label>Contenido del post</label>
+							<div @ref="quillJsEditorDiv" class="border border-secondary p-4"></div>
 						</div>
 
 						<div class="form-group mb-5">
@@ -103,6 +103,7 @@
 
 	[Inject] HttpClient HttpClient { get; set; }
 	[Inject] InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
+	[Inject] IJSRuntime JSRuntime { get; set; }
 
 	private PostDTO postToCreate = new()
 	{
@@ -112,10 +113,26 @@
 	private bool attempingToCreate = false;
 	private bool attempingToCreateFailed;
 	private bool createSuccessful = false;
+	private ElementReference quillJsEditorDiv;
+
+	protected async override Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender && InMemoryDataBaseCache.Categories == null)
+		{
+			await InMemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(false);
+			StateHasChanged();
+		}
+
+		if (firstRender)
+		{
+			await JSRuntime.InvokeVoidAsync("QuillFunctions.createQuill", quillJsEditorDiv, true);
+		}
+	}
 
 	private async Task CreatePost()
 	{
 		attempingToCreate = true;
+		postToCreate.Content = await JSRuntime.InvokeAsync<string>("QuillFunctions.getQuillContent", quillJsEditorDiv);
 
 		HttpResponseMessage response = await HttpClient
 				.PostAsJsonAsync<PostDTO>(ApiEndpoints.s_posts, postToCreate);

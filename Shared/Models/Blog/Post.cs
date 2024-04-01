@@ -19,7 +19,6 @@ public class Post
     [MaxLength(256)]
     public string Thumbnailimage { get; set; }
 
-    [Required]
     [MaxLength(65536)]
     public string Content { get; set; }
 
