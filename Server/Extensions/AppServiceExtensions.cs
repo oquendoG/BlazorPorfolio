@@ -40,6 +40,11 @@ public static class AppServiceExtensions
     public static void ConfigureCors(this IServiceCollection services)
     {
         services.AddCors(options => options.AddPolicy("corspolicy", builder =>
-                                    builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()));
+                                    builder
+                                    .AllowAnyHeader()
+                                    .AllowAnyOrigin()
+                                    .AllowCredentials()
+                                    .SetIsOriginAllowed(host => true)
+                                    .AllowAnyMethod()));
     }
 }
