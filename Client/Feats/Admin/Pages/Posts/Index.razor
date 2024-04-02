@@ -78,13 +78,13 @@
                                                 <div class="d-flex flex-column">
                                                     @if(post.Published is false)
                                                     {
-                                                        <button class="btn btn-success shadow md-f-size-1-5">
+                                                        <button @onclick="() => PublishOrUnpublishPost(post)" class="btn btn-success shadow md-f-size-1-5">
                                                             <i class="fas fa-eye"></i> Publicar
                                                         </button>
                                                     }
                                                     else
                                                     {
-                                                        <button class="btn btn-success shadow md-f-size-1-5">
+                                                        <button @onclick="() => PublishOrUnpublishPost(post)" class="btn btn-success shadow md-f-size-1-5">
                                                             <i class="fas fa-eye-slash"></i> Anular publicación
                                                         </button>
                                                     }
@@ -124,6 +124,24 @@
                         <Toast IsError="true"
                                ToastTitle="El post no se borró correctamente"
                                ToastBody="@($"La razón es: {reasonUnsuccessfullTryToDelete} intente de nuevo y si el error persiste contacte al administrador")"
+                               ParentMethodToCallOnClickBtnClose="() => succesfullyDeleted = false">
+                        </Toast>
+                    }
+
+                    @if (successfullyPusblishOrUnpublish)
+                    {
+                        <Toast IsError="false"
+                               ToastTitle="@($"{(lastPublishedOrUnpublishedPost.Published ? "Publicado" : "Publicación anulada")} satisfactoriamente.")"
+                               ToastBody="@($"{(lastPublishedOrUnpublishedPost.Published ? "El post está ahora visble el sitio público" : "El post ya no está más visible en el sitio público")}")"
+                               ParentMethodToCallOnClickBtnClose="() => succesfullyDeleted = false">
+                        </Toast>
+                    }
+
+                    @if (unsuccessfullytTryToPusblishOrUnpublish)
+                    {
+                        <Toast IsError="true"
+                               ToastTitle="la actualización de publicación falló"
+                               ToastBody="Algo fue mal al comunicarse con el servidor, pruebe de nuevo o comuniquese con el administrador"
                                ParentMethodToCallOnClickBtnClose="() => succesfullyDeleted = false">
                         </Toast>
                     }
@@ -179,4 +197,31 @@
             unsuccessfullTryToDelete = true;
         }
     }
+
+    private bool successfullyPusblishOrUnpublish = false;
+    private bool unsuccessfullytTryToPusblishOrUnpublish = false;
+    private Post lastPublishedOrUnpublishedPost = new();
+
+    private async Task PublishOrUnpublishPost(Post post)
+    {
+        post.Published = !post.Published;
+        HttpResponseMessage httpResponse = await httpClient
+            .PutAsJsonAsync<Post>(Path.Combine(ApiEndpoints.s_posts, post.Id.ToString()), post);
+
+        if(httpResponse.StatusCode == HttpStatusCode.OK)
+        {
+            Post updatedPost = await httpResponse.Content.ReadFromJsonAsync<Post>();
+            post = updatedPost;
+
+            Post uneditedPostInList = await InMemoryDataBaseCache.GetPostById(post.Id);
+            uneditedPostInList.Published = updatedPost.Published;
+            uneditedPostInList.PublishDate = updatedPost.PublishDate;
+
+            successfullyPusblishOrUnpublish = true;
+        }else
+        {
+            unsuccessfullytTryToPusblishOrUnpublish = true;
+        }
+    }
+
 }
