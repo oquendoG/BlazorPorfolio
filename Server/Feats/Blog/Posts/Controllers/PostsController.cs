@@ -96,7 +96,7 @@ public class PostsController : ControllerBase
             return StatusCode(500, "Ha hábido una excepción por favor comuniquese con el administrador del sistema o mire los logs");
         }
 
-        return Ok("Actualizado correctamente");
+        return Ok(UpdatedPost);
     }
 
     [HttpDelete("{id}")]

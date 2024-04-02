@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
 using Shared.Models.Blog;
@@ -39,7 +40,7 @@ public static class AppServiceExtensions
 
     public static void ConfigureCors(this IServiceCollection services)
     {
-        services.AddCors(options => options.AddPolicy("corspolicy", builder =>
+        services.AddCors(options => options.AddPolicy(name: "CorsPolicy", builder =>
                                     builder
                                     .AllowAnyOrigin()
                                     .AllowAnyHeader()

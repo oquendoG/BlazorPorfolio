@@ -1,0 +1,238 @@
+﻿@using System.Net;
+@page "/admin/posts/actualizar/{PostId:guid}";
+
+<main class="admin-area-main">
+    <SideBar></SideBar>
+
+    <div class="admin-area-content container-fluid bg-white">
+        <div class="row g-0">
+            <div class="col">
+                <h1 class="mb-3">Actualizar post</h1>
+                @if (postToUpdate is null)
+                {
+                    <Loading></Loading>
+                }
+                else
+                {
+                    <EditForm Model="postToUpdate" OnValidSubmit="UpdatePost">
+                        <DataAnnotationsValidator />
+
+                        @if (InMemoryDataBaseCache.Categories == null)
+                        {
+                            <Loading></Loading>
+                        }
+                        else
+                        {
+                            <div class="form-group mb-5">
+                                <label for="postCategory">Category</label>
+                                <InputSelect @bind-Value="@postToUpdate.CategoryId" class="form-control" id="postCategory">
+                                    @foreach (var category in InMemoryDataBaseCache.Categories)
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        }
+
+                        <div class="form-group mb-5">
+                            <label for="postTitle">Post title</label>
+                            <InputText @bind-Value="postToUpdate.Title" class="form-control" id="postTitle"></InputText>
+                        </div>
+
+                        <div class="form-group mb-5">
+                            <label for="thumbnailImage">Thumbnail image (jpg/jpeg or png 1920x1080)</label>
+
+                            @if (attemptingtoUploadImage == true)
+                            {
+                                <Loading></Loading>
+                            }
+                            else if (attemptToUploadFailed == true)
+                            {
+                                <h4 class="text-danger">Failed to upload image. @reasonImageUploadFailed</h4>
+                            }
+                            else
+                            {
+                                <img src="@($"{ApiEndpoints.ServerBaseUrl}/{postToUpdate.Thumbnailimage}")" class="admin-crud-form-thumbnail-image" alt="Post thumbnail image" />
+                            }
+
+                            <br />
+
+                            <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailImage" />
+                        </div>
+
+                        <div class="form-group mb-5">
+                            <label for="postExcerpt">Extracto del post</label>
+                            <InputText @bind-Value="postToUpdate.Excerpt" class="form-control" id="postExcerpt"></InputText>
+                        </div>
+
+                        <div class="form-group mb-5 flex-shrink-1">
+                            <label>Contenido del post</label>
+                            <div @ref="quillJsEditorDiv" class="border border-secondary p-4"></div>
+                        </div>
+
+                        <div class="form-group mb-5">
+                            <label for="postPublished">Publicar post</label>
+                            <InputCheckbox @bind-Value="@postToUpdate.Published" class="form-check-input" id="postPublished" aria-describedby="postPublishedHelp" />
+                            <div id="postPublishedHelp" class="form-text">
+                                El valor de esto especifica si esta publicación de blog es visible en el sitio de cara al usuario o no.
+                                La publicación de una publicación de blog también actualiza el valor del campo fecha de publicación.
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-5">
+                            <label for="postAuthor">Autor del post</label>
+                            <InputText @bind-Value="postToUpdate.Author" class="form-control" id="postAuthor"></InputText>
+                        </div>
+
+                        <ValidationSummary />
+
+                        @if (attempingToUpdate == true)
+                        {
+                            <Loading></Loading>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success shadow d-block mt-5 md-f-size-1-5" type="submit">
+                                <i class="far fa-save"></i> Guardar
+                            </button>
+                            <a href="/admin/posts" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a los posts</a>
+                        }
+
+                    </EditForm>
+                }
+                <div class="position-fixed bottom-0 end-50 z-index-5">
+
+                    @if (updateSuccessful)
+                    {
+                        <Toast IsError="false" ToastTitle="Actualización correcta"
+                               ToastBody="La actualización se realizó correctamente"
+                               ParentMethodToCallOnClickBtnClose="() => updateSuccessful = false" />
+                    }
+                    @if (attempingToUpdateFailed)
+                    {
+                        <Toast IsError="true" ToastTitle="Actualización fallida"
+                               ToastBody="La actualización falló si el problema persiste contácte al administrador"
+                               ParentMethodToCallOnClickBtnClose="() => attempingToUpdateFailed = false" />
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+@code {
+
+    [Parameter] public Guid PostId { get; set; }
+
+    [Inject] HttpClient HttpClient { get; set; }
+    [Inject] InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
+    [Inject] IJSRuntime JSRuntime { get; set; }
+
+    private PostDTO postToUpdate = null;
+
+    private bool attempingToUpdate = false;
+    private bool attempingToUpdateFailed = false;
+    private bool updateSuccessful = false;
+    private ElementReference quillJsEditorDiv;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+
+        if (firstRender)
+        {
+            postToUpdate = await InMemoryDataBaseCache.GetPostDtoById(PostId);
+
+            if (firstRender && InMemoryDataBaseCache.Categories == null)
+            {
+                await InMemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(false);
+            }
+
+            StateHasChanged();
+
+            await JSRuntime.InvokeVoidAsync("QuillFunctions.createQuill", quillJsEditorDiv, true);
+
+            if(string.IsNullOrEmpty(postToUpdate.Content) is false)
+            {
+                await JSRuntime.InvokeAsync<object>("QuillFunctions.setQuillContent", quillJsEditorDiv, postToUpdate.Content);
+            }
+        }
+    }
+
+    private async Task UpdatePost()
+    {
+        attempingToUpdate = true;
+        postToUpdate.Content = await JSRuntime.InvokeAsync<string>("QuillFunctions.getQuillContent", quillJsEditorDiv);
+
+        HttpResponseMessage response = await HttpClient
+                .PutAsJsonAsync<PostDTO>(Path.Combine(ApiEndpoints.s_posts, PostId.ToString()), postToUpdate);
+
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            attempingToUpdateFailed = true;
+            return;
+        }
+
+        Post updatedPost = await response.Content.ReadFromJsonAsync<Post>();
+
+        Post unupdatedPostInList = await InMemoryDataBaseCache.GetPostById(updatedPost.Id);
+
+        updatedPost.Category = await InMemoryDataBaseCache.GetCategoryById(updatedPost.CategoryId, false);
+        UtilityFunctions.CopyObjectProperties(updatedPost, unupdatedPostInList);
+
+        updateSuccessful = true;
+
+        attempingToUpdate = false;
+    }
+
+    private bool attemptingtoUploadImage = false;
+    private bool attemptToUploadFailed = false;
+    private string reasonImageUploadFailed = string.Empty;
+
+    public async Task HandleUploadedImage(InputFileChangeEventArgs e)
+    {
+        attemptingtoUploadImage = true;
+        if (e.File.ContentType != "image/jpeg" && e.File.ContentType != "image/png")
+        {
+            reasonImageUploadFailed = "Solo se admiten los formatos jpg y png";
+            attempingToUpdateFailed = true;
+        }
+        else if (e.File.Size >= 32505856)
+        {
+            reasonImageUploadFailed = "Solo se admiten imágenes con tamaño menor a 30mb";
+            attempingToUpdateFailed = true;
+        }
+        else
+        {
+            IBrowserFile UploadedImageFile = e.File;
+            byte[] imageAsByteArray = new byte[UploadedImageFile.Size];
+
+            await UploadedImageFile.OpenReadStream(32505856).ReadAsync(imageAsByteArray);
+            string byteString = Convert.ToBase64String(imageAsByteArray);
+
+            UploadedImage uploadedImage = new()
+            {
+                NewImageFileExtension = UploadedImageFile.Name.Substring(UploadedImageFile.Name.Length - 4),
+                NewImageBase64Content = byteString,
+                OldImagePath = string.Empty
+            };
+
+            HttpResponseMessage response = await HttpClient
+                    .PostAsJsonAsync<UploadedImage>(ApiEndpoints.s_imageUpload, uploadedImage);
+
+            if (response.StatusCode == HttpStatusCode.Created)
+            {
+                postToUpdate.Thumbnailimage = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                reasonImageUploadFailed = $"Algo salió mal al hacer la petición al servidor. Código {response.StatusCode}. Motivo del error: {response.ReasonPhrase}";
+                attempingToUpdateFailed = true;
+            }
+
+            attemptingtoUploadImage = false;
+            StateHasChanged();
+        }
+    }
+}

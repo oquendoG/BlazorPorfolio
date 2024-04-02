@@ -51,7 +51,7 @@ app.UseSwaggerUI(options =>
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseCors("corspolicy");
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 
