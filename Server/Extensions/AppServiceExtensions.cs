@@ -41,7 +41,7 @@ public static class AppServiceExtensions
     {
         services.AddCors(options => options.AddPolicy("corspolicy", builder =>
                                     builder
-                                    .WithOrigins("https://wilsonserver.azurewebsites.net/")
+                                    .AllowAnyOrigin()
                                     .AllowAnyHeader()
                                     .AllowAnyMethod()));
     }
