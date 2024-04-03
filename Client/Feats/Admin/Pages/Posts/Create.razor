@@ -2,203 +2,204 @@
 @page "/admin/posts/crear";
 
 <main class="admin-area-main">
-	<SideBar></SideBar>
+    <SideBar></SideBar>
 
-	<div class="admin-area-content container-fluid bg-white">
-		<div class="row g-0">
-			<div class="col">
-				<h1 class="mb-3">@(createSuccessful ? "Post creado correctamente" : "Crear post")</h1>
-				@if (attempingToCreate)
-				{
-					<h2>Creando post...</h2>
-					<Loading></Loading>
-				}
-				else if (createSuccessful is false && attempingToCreate is false)
-				{
-					<EditForm Model="postToCreate" OnValidSubmit="CreatePost">
-						<DataAnnotationsValidator />
+    <div class="admin-area-content container-fluid bg-white">
+        <div class="row g-0">
+            <div class="col">
+                <h1 class="mb-3">@(createSuccessful ? "Post creado correctamente" : "Crear post")</h1>
+                @if (attempingToCreate)
+                {
+                    <h2>Creando post...</h2>
+                    <Loading></Loading>
+                }
+                else if (createSuccessful is false && attempingToCreate is false)
+                {
+                    <EditForm Model="postToCreate" OnValidSubmit="CreatePost">
+                        <DataAnnotationsValidator />
 
-						@if (InMemoryDataBaseCache.Categories == null)
-						{
-							<Loading></Loading>
-						}
-						else
-						{
-							<div class="form-group mb-5">
-								<label for="postCategory">Category</label>
-								<InputSelect @bind-Value="@postToCreate.CategoryId" class="form-control" id="postCategory">
-									@foreach (var category in InMemoryDataBaseCache.Categories)
-									{
-										<option value="@category.Id">@category.Name</option>
-									}
-								</InputSelect>
-							</div>
-						}
+                        @if (InMemoryDataBaseCache.Categories == null)
+                        {
+                            <Loading></Loading>
+                        }
+                        else
+                        {
+                            <div class="form-group mb-5">
+                                <label for="postCategory">Category</label>
+                                <InputSelect @bind-Value="@postToCreate.CategoryId" class="form-control" id="postCategory">
+                                    @foreach (var category in InMemoryDataBaseCache.Categories)
+                                    {
+                                        <option value="@category.Id">@category.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                        }
 
-						<div class="form-group mb-5">
-							<label for="postTitle">Post title</label>
-							<InputText @bind-Value="postToCreate.Title" class="form-control" id="postTitle"></InputText>
-						</div>
+                        <div class="form-group mb-5">
+                            <label for="postTitle">Post title</label>
+                            <InputText @bind-Value="postToCreate.Title" class="form-control" id="postTitle"></InputText>
+                            <ValidationMessage For="() => postToCreate.Title"></ValidationMessage>
+                        </div>
 
-						<div class="form-group mb-5">
-							<label for="thumbnailImage">Thumbnail image (jpg/jpeg or png 1920x1080)</label>
+                        <div class="form-group mb-5">
+                            <label for="thumbnailImage">Thumbnail image (jpg/jpeg or png 1920x1080)</label>
 
-							@if (attemptingtoUploadImage == true)
-							{
-								<Loading></Loading>
-							}
-							else if (attemptToUploadFailed == true)
-							{
-								<h4 class="text-danger">Failed to upload image. @reasonImageUploadFailed</h4>
-							}
-							else
-							{
-								<img src="@($"{ApiEndpoints.ServerBaseUrl}/{postToCreate.Thumbnailimage}")" class="admin-crud-form-thumbnail-image" alt="Post thumbnail image" />
-							}
+                            @if (attemptingtoUploadImage == true)
+                            {
+                                <Loading></Loading>
+                            }
+                            else if (attemptToUploadFailed == true)
+                            {
+                                <h4 class="text-danger">Failed to upload image. @reasonImageUploadFailed</h4>
+                            }
+                            else
+                            {
+                                <img src="@($"{ApiEndpoints.ServerBaseUrl}/{postToCreate.Thumbnailimage}")" class="admin-crud-form-thumbnail-image" alt="Post thumbnail image" />
+                            }
 
-							<br />
+                            <br />
 
-							<InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailImage" />
-						</div>
+                            <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailImage" />
+                        </div>
 
-						<div class="form-group mb-5">
-							<label for="postExcerpt">Extracto del post</label>
-							<InputText @bind-Value="postToCreate.Excerpt" class="form-control" id="postExcerpt"></InputText>
-						</div>
+                        <div class="form-group mb-5">
+                            <label for="postExcerpt">Extracto del post</label>
+                            <InputText @bind-Value="postToCreate.Excerpt" class="form-control" id="postExcerpt"></InputText>
+                        </div>
 
-						<div class="form-group mb-5 flex-shrink-1">
-							<label>Contenido del post</label>
-							<div @ref="quillJsEditorDiv" class="border border-secondary p-4"></div>
-						</div>
+                        <div class="form-group mb-5 flex-shrink-1">
+                            <label>Contenido del post</label>
+                            <div @ref="quillJsEditorDiv" class="border border-secondary p-4"></div>
+                        </div>
 
-						<div class="form-group mb-5">
-							<label for="postPublished">Publicar post</label>
-							<InputCheckbox @bind-Value="@postToCreate.Published" class="form-check-input" id="postPublished" aria-describedby="postPublishedHelp" />
-							<div id="postPublishedHelp" class="form-text">
-								El valor de esto especifica si esta publicación de blog es visible en el sitio de cara al usuario o no.
-								La publicación de una publicación de blog también actualiza el valor del campo fecha de publicación.
-							</div>
-						</div>
+                        <div class="form-group mb-5">
+                            <label for="postPublished">Publicar post</label>
+                            <InputCheckbox @bind-Value="@postToCreate.Published" class="form-check-input" id="postPublished" aria-describedby="postPublishedHelp" />
+                            <div id="postPublishedHelp" class="form-text">
+                                El valor de esto especifica si esta publicación de blog es visible en el sitio de cara al usuario o no.
+                                La publicación de una publicación de blog también actualiza el valor del campo fecha de publicación.
+                            </div>
+                        </div>
 
-						<div class="form-group mb-5">
-							<label for="postAuthor">Autor del post</label>
-							<InputText @bind-Value="postToCreate.Author" class="form-control" id="postAuthor"></InputText>
-						</div>
+                        <div class="form-group mb-5">
+                            <label for="postAuthor">Autor del post</label>
+                            <InputText @bind-Value="postToCreate.Author" class="form-control" id="postAuthor"></InputText>
+                        </div>
 
-						<ValidationSummary />
 
-						<button class="btn btn-success shadow d-block mt-5 md-f-size-1-5" type="submit">
-							<i class="far fa-save"></i> Guardar
-						</button>
 
-					</EditForm>
-				}
-				<a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
-			</div>
-		</div>
-	</div>
+                        <button class="btn btn-success shadow d-block mt-5 md-f-size-1-5" type="submit">
+                            <i class="far fa-save"></i> Guardar
+                        </button>
+
+                    </EditForm>
+                }
+                <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
+            </div>
+        </div>
+    </div>
 </main>
 
 @code {
 
-	[Inject] HttpClient HttpClient { get; set; }
-	[Inject] InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
-	[Inject] IJSRuntime JSRuntime { get; set; }
+    [Inject] HttpClient HttpClient { get; set; }
+    [Inject] InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
+    [Inject] IJSRuntime JSRuntime { get; set; }
 
-	private PostDTO postToCreate = new()
-	{
-		Thumbnailimage = Path.Combine("uploads", "placeholder.jpg")
-	};
+    private PostDTO postToCreate = new()
+        {
+            Thumbnailimage = Path.Combine("uploads", "placeholder.jpg")
+        };
 
-	private bool attempingToCreate = false;
-	private bool attempingToCreateFailed;
-	private bool createSuccessful = false;
-	private ElementReference quillJsEditorDiv;
+    private bool attempingToCreate = false;
+    private bool attempingToCreateFailed;
+    private bool createSuccessful = false;
+    private ElementReference quillJsEditorDiv;
 
-	protected async override Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender && InMemoryDataBaseCache.Categories == null)
-		{
-			await InMemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(false);
-			StateHasChanged();
-		}
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && InMemoryDataBaseCache.Categories == null)
+        {
+            await InMemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(false);
+            StateHasChanged();
+        }
 
-		if (firstRender)
-		{
-			await JSRuntime.InvokeVoidAsync("QuillFunctions.createQuill", quillJsEditorDiv, true);
-		}
-	}
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("QuillFunctions.createQuill", quillJsEditorDiv, true);
+        }
+    }
 
-	private async Task CreatePost()
-	{
-		attempingToCreate = true;
-		postToCreate.Content = await JSRuntime.InvokeAsync<string>("QuillFunctions.getQuillContent", quillJsEditorDiv);
+    private async Task CreatePost()
+    {
+        attempingToCreate = true;
+        postToCreate.Content = await JSRuntime.InvokeAsync<string>("QuillFunctions.getQuillContent", quillJsEditorDiv);
 
-		HttpResponseMessage response = await HttpClient
-				.PostAsJsonAsync<PostDTO>(ApiEndpoints.s_posts, postToCreate);
+        HttpResponseMessage response = await HttpClient
+                .PostAsJsonAsync<PostDTO>(ApiEndpoints.s_posts, postToCreate);
 
-		if (response.StatusCode != HttpStatusCode.Created)
-		{
-			attempingToCreateFailed = true;
-			return;
-		}
+        if (response.StatusCode != HttpStatusCode.Created)
+        {
+            attempingToCreateFailed = true;
+            return;
+        }
 
-		Post addedPost = await response.Content.ReadFromJsonAsync<Post>();
-		addedPost.Category = await InMemoryDataBaseCache.GetCategoryById(addedPost.CategoryId, false);
-		InMemoryDataBaseCache.Posts.Add(addedPost);
+        Post addedPost = await response.Content.ReadFromJsonAsync<Post>();
+        addedPost.Category = await InMemoryDataBaseCache.GetCategoryById(addedPost.CategoryId, false);
+        InMemoryDataBaseCache.Posts.Add(addedPost);
 
-		createSuccessful = true;
+        createSuccessful = true;
 
-		attempingToCreate = false;
-	}
+        attempingToCreate = false;
+    }
 
-	private bool attemptingtoUploadImage = false;
-	private bool attemptToUploadFailed = false;
-	private string reasonImageUploadFailed = string.Empty;
+    private bool attemptingtoUploadImage = false;
+    private bool attemptToUploadFailed = false;
+    private string reasonImageUploadFailed = string.Empty;
 
-	public async Task HandleUploadedImage(InputFileChangeEventArgs e)
-	{
-		attemptingtoUploadImage = true;
-		if (e.File.ContentType != "image/jpeg" && e.File.ContentType != "image/png")
-		{
-			reasonImageUploadFailed = "Solo se admiten los formatos jpg y png";
-			attempingToCreateFailed = true;
-		}
-		else if (e.File.Size >= 32505856)
-		{
-			reasonImageUploadFailed = "Solo se admiten imágenes con tamaño menor a 30mb";
-			attempingToCreateFailed = true;
-		}
-		else
-		{
-			IBrowserFile UploadedImageFile = e.File;
-			byte[] imageAsByteArray = new byte[UploadedImageFile.Size];
+    public async Task HandleUploadedImage(InputFileChangeEventArgs e)
+    {
+        attemptingtoUploadImage = true;
+        if (e.File.ContentType != "image/jpeg" && e.File.ContentType != "image/png")
+        {
+            reasonImageUploadFailed = "Solo se admiten los formatos jpg y png";
+            attempingToCreateFailed = true;
+        }
+        else if (e.File.Size >= 32505856)
+        {
+            reasonImageUploadFailed = "Solo se admiten imágenes con tamaño menor a 30mb";
+            attempingToCreateFailed = true;
+        }
+        else
+        {
+            IBrowserFile UploadedImageFile = e.File;
+            byte[] imageAsByteArray = new byte[UploadedImageFile.Size];
 
-			await UploadedImageFile.OpenReadStream(32505856).ReadAsync(imageAsByteArray);
-			string byteString = Convert.ToBase64String(imageAsByteArray);
+            await UploadedImageFile.OpenReadStream(32505856).ReadAsync(imageAsByteArray);
+            string byteString = Convert.ToBase64String(imageAsByteArray);
 
-			UploadedImage uploadedImage = new()
-			{
-				NewImageFileExtension = UploadedImageFile.Name.Substring(UploadedImageFile.Name.Length - 4),
-				NewImageBase64Content = byteString,
-				OldImagePath = string.Empty
-			};
+            UploadedImage uploadedImage = new()
+                {
+                    NewImageFileExtension = UploadedImageFile.Name.Substring(UploadedImageFile.Name.Length - 4),
+                    NewImageBase64Content = byteString,
+                    OldImagePath = string.Empty
+                };
 
-			HttpResponseMessage response = await HttpClient
-					.PostAsJsonAsync<UploadedImage>(ApiEndpoints.s_imageUpload, uploadedImage);
+            HttpResponseMessage response = await HttpClient
+                    .PostAsJsonAsync<UploadedImage>(ApiEndpoints.s_imageUpload, uploadedImage);
 
-			if (response.StatusCode == HttpStatusCode.Created)
-			{
-				postToCreate.Thumbnailimage = await response.Content.ReadAsStringAsync();
-			}
-			else
-			{
-				reasonImageUploadFailed = $"Algo salió mal al hacer la petición al servidor. Código {response.StatusCode}. Motivo del error: {response.ReasonPhrase}";
-				attempingToCreateFailed = true;
-			}
+            if (response.StatusCode == HttpStatusCode.Created)
+            {
+                postToCreate.Thumbnailimage = await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                reasonImageUploadFailed = $"Algo salió mal al hacer la petición al servidor. Código {response.StatusCode}. Motivo del error: {response.ReasonPhrase}";
+                attempingToCreateFailed = true;
+            }
 
-			attemptingtoUploadImage = false;
-			StateHasChanged();
-		}
-	}
+            attemptingtoUploadImage = false;
+            StateHasChanged();
+        }
+    }
 }

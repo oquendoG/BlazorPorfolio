@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Validators;
+using System.ComponentModel.DataAnnotations;
 
 namespace Shared.Models.Blog;
 
@@ -9,6 +10,8 @@ public class Post
 
     [Required]
     [MaxLength(128)]
+    [NoPeriods(ErrorMessage = "El título no debe tener puntos (.)")]
+    [SpacesInARow(ErrorMessage = "El título del post contiene mas de 3 espacios seguidos")]
     public string Title { get; set; }
 
     [Required]

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Shared.Validators;
+using System.ComponentModel.DataAnnotations;
 
 namespace Shared.Models.Blog;
 public class Category
@@ -12,6 +13,8 @@ public class Category
 
     [Required]
     [MaxLength(128)]
+    [NoPeriods(ErrorMessage = "El nombre no debe tener puntos (.)")]
+    [SpacesInARow(ErrorMessage = "El nombre de la categoría contiene mas de 3 espacios seguidos")]
     public string Name { get; set; }
 
     [Required]
