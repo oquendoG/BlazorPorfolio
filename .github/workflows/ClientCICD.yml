@@ -19,7 +19,7 @@ jobs:
         runs-on: windows-latest
         name: Build
         steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
             with:
               submodules: true
           - uses: actions/setup-dotnet@v4
@@ -31,7 +31,7 @@ jobs:
               dotnet --version
               dotnet workload install microsoft-net-sdk-blazorwebassembly-aot
               dotnet publish -c Release -o out
-          - uses: actions/upload-artifact@v4
+          - uses: actions/upload-artifact@v3
             with:
               name: out
               path: Client/out
@@ -42,7 +42,7 @@ jobs:
         name: Deploy
         needs: build
         steps:
-          - uses: actions/download-artifact@v2
+          - uses: actions/download-artifact@v3
             with:
               name: out
               path: out
