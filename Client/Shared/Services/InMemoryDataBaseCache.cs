@@ -54,7 +54,7 @@ internal sealed class InMemoryDataBaseCache
             categoriesDb = await httpClient.GetFromJsonAsync<List<Category>>(ApiEndpoints.s_categories);
         }
 
-        categories = categoriesDb.OrderByDescending(cat => cat.Id).ToList();
+        categories = [.. categoriesDb.OrderByDescending(cat => cat.Id)];
 
         if (withPosts)
         {
@@ -66,13 +66,13 @@ internal sealed class InMemoryDataBaseCache
 
     private void GetPostsFromCachedCategories()
     {
-        List<Post> postsFromCategories = new();
+        List<Post> postsFromCategories = [];
 
         foreach ((Category category, Post post) in categories
                  .Where(category => category.Posts.Count != 0)
                         .SelectMany(category => category.Posts.Select(post => (category, post))))
         {
-            Category postCategoryWithoutposts = new()
+            post.Category = new()
             {
                 Id = category.Id,
                 ThumbnailImage = category.ThumbnailImage,
@@ -80,11 +80,10 @@ internal sealed class InMemoryDataBaseCache
                 Description = category.Description,
                 Posts = null
             };
-            post.Category = postCategoryWithoutposts;
             postsFromCategories.Add(post);
         }
 
-        posts = postsFromCategories.OrderByDescending(pst => pst.Id).ToList();
+        posts = [.. postsFromCategories.OrderByDescending(pst => pst.Id)];
     }
 
     internal async Task<Category> GetCategoryById(Guid Id, bool withPosts)
@@ -116,7 +115,7 @@ internal sealed class InMemoryDataBaseCache
             category = Categories.FirstOrDefault(cat => cat.Name.ToLowerInvariant() == name);
         }
 
-        if (category.Posts is null && withPosts == false)
+        if (category.Posts is null && !withPosts)
         {
             category = category = await httpClient.GetFromJsonAsync<Category>($"{ApiEndpoints.s_categoriesWithPosts}/{category.Id}");
         }

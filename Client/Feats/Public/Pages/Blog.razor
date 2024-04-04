@@ -5,18 +5,25 @@
     <div class="row">
         <div class="col">
             <h1 class="my-3">Blog</h1>
-            <p>Click a category card to view its blog posts.</p>
+            <p>Da clic en una categoría para ver sus posts</p>
 
             <div class="row">
-                @if(MemoryDataBaseCache.Categories is not null)
+                @if(MemoryDataBaseCache.Categories is null)
+                {
+                    <Loading></Loading>
+                }else if(MemoryDataBaseCache.Categories.Count < 1)
+                {
+                    <h3>No se encontraron categorías</h3>
+                }else if (MemoryDataBaseCache.Categories is not null && MemoryDataBaseCache.Categories.Count > 1)
                 {
                     for (int i = 0; i < MemoryDataBaseCache.Categories.Count; i++)
                     {
-                        <div class="col-md-4">
+                        <div class="col-md-4 mb-3">
                             <CategoryCard Category="MemoryDataBaseCache.Categories[i]" />
                         </div>
                     }
                 }
+               
             </div>
         </div>
     </div>

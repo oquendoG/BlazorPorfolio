@@ -60,7 +60,7 @@
                                ToastBody="La actiualización se realizó correctamente"
                                ParentMethodToCallOnClickBtnClose="() => attemptToUploadFailed = false" />
                     }
-                    @if (attempingToUpdate)
+                    @if (attempingToUpdateFailed)
                     {
                         <Toast IsError="true" ToastTitle="Actualización fallida"
                                ToastBody="La actualización falló si el problema persiste contácte al administrador"

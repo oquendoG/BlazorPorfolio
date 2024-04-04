@@ -95,6 +95,17 @@
                     </EditForm>
                 }
                 <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
+
+                <div class="position-fixed bottom-0 end-50 z-index-5">
+                    
+                    @if (attempingToCreateFailed)
+                    {
+                        <Toast IsError="true" ToastTitle="No se pudo crear el post"
+                               ToastBody="Intente de nuevo si el problema persiste contácte al administrador"
+                               ParentMethodToCallOnClickBtnClose="() => attempingToCreateFailed = false" />
+                    }
+
+                </div>
             </div>
         </div>
     </div>

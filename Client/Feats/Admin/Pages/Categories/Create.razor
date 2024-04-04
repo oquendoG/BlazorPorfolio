@@ -48,6 +48,18 @@
                         </button>
                     </EditForm>
                 }
+
+                <div class="position-fixed bottom-0 end-50 z-index-5">
+                    }
+                    @if (attempingToCreateFailed)
+                    {
+                        <Toast IsError="true" ToastTitle="No se pudo crear la categoría"
+                               ToastBody="Intente de nuevo si el problema persiste contácte al administrador"
+                               ParentMethodToCallOnClickBtnClose="() => attempingToCreateFailed = false" />
+                    }
+
+                </div>
+
                 <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
             </div>
         </div>
@@ -66,7 +78,7 @@
     };
 
     private bool attempingToCreate = false;
-    private bool attempingToCreateFailed;
+    private bool attempingToCreateFailed = false;
     private bool createSuccessful = false;
 
     private async Task CreateCategory()
