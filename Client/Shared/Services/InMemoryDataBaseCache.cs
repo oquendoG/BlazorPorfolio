@@ -112,7 +112,7 @@ internal sealed class InMemoryDataBaseCache
         Category category = null;
         if (nameToLowerFromUrl)
         {
-            category = Categories.FirstOrDefault(cat => cat.Name.ToLowerInvariant() == name);
+            category = Categories.Find(cat => cat.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
         }
 
         if (category.Posts is null && !withPosts)

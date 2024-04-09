@@ -72,7 +72,7 @@ namespace Shared.Static
             else
             {
                 return stringWithHypensReplacedBySpaces;
-            }                      
+            }
         }
 
         public static string ConvertTitleToURL(this string str) => str.Replace(' ', '-');

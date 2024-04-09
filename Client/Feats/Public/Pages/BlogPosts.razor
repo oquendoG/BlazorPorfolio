@@ -1,0 +1,110 @@
+﻿@page "/blog/{CategoryName}/{PostTitle}"
+
+<Navbar></Navbar>
+
+<main class="container min-vh-90 py-5">
+    @if (category is null || post is null)
+    {
+        <Loading></Loading>
+    }
+    else
+    {
+        <div class="row">
+
+            <div class="col-12 px-md-0">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb md-f-size-1-5">
+                        <li class="breadcrumb-item">
+                            <a href="/blog">Blog</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="@($"/blog/{CategoryName}")">@category.Name</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            @post.Title
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="col-12 shadow-no-hover py-5 px-md-5 mt-3">
+                <article class="blog-post">
+                    <h2 class="fst-italic">@post.Title</h2>
+                    <p>@post.PublishDate.Split(' ').First() por <a href="/about">@post.Author</a> </p>
+                    <hr>
+                    @if (loadingContent)
+                    {
+                        <Loading></Loading>
+                    }
+
+                    <div @ref="quillJsEditorDiv" class="p-0 mt-5"></div>
+
+                </article>
+            </div>
+
+            <div class="col-12 px-0 d-flex justify-content-end">
+                <a href="@($"/blog/{CategoryName}")" class="btn btn-secondary shadow">
+                    <i class="fas fa-arrow-left">Regresar a los posts en @category.Name</i>
+                </a>
+            </div>
+
+        </div>
+
+    }
+</main>
+
+@code {
+    [Parameter]
+    public string CategoryName { get; set; }
+
+    [Parameter]
+    public string PostTitle { get; set; }
+
+    [Inject]
+    InMemoryDataBaseCache inMemoryDataBaseCache { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    IJSRuntime jSRuntime { get; set; }
+
+    private Category category = new();
+
+    private Post post = new();
+
+    private ElementReference quillJsEditorDiv;
+
+    private bool loadingContent = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loadingContent = true;
+
+        category = await inMemoryDataBaseCache.GetCategoryByName(CategoryName.ConvertURLToTitle(), true, true);
+
+        string postTitleFromUrl = PostTitle.ConvertURLToTitle();
+
+        post = category.Posts.FirstOrDefault(post => post.Title.ToLowerInvariant() == postTitleFromUrl);
+
+        StateHasChanged();
+
+
+        await Task.Delay(400);
+
+        await jSRuntime.InvokeVoidAsync("QuillFunctions.createQuill", quillJsEditorDiv, false);
+
+        if (!string.IsNullOrEmpty(post.Content))
+        {
+            await jSRuntime.InvokeAsync<object>("QuillFunctions.setQuillContent", quillJsEditorDiv, post.Content);
+        }
+
+
+        await jSRuntime.InvokeAsync<object>("QuillFunctions.disableQuillEditor", quillJsEditorDiv);
+
+        loadingContent = false;
+
+        StateHasChanged();
+    }
+
+}

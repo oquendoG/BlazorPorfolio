@@ -1,0 +1,76 @@
+﻿@page "/blog/{CategoryName}"
+
+
+<Navbar />
+
+<main class="container min-vh-90 py-5">
+    <div class="row">
+        @if (category is null || publishedPosts is null)
+        {
+            <Loading></Loading>
+        }
+        else
+        {
+            <nav aria-label="breadcrumb" class="ps-3 row md-f-size-1-5">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/blog">Blog</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        @category.Name
+                    </li>
+                </ol>
+            </nav>
+
+            <h1 class="my-3">Posts en @category.Name</h1>
+
+            if (InMemoryDataBaseCache.Posts.Count < 1)
+            {
+                <h3>No se encontraron posts</h3>
+            }
+            else if (InMemoryDataBaseCache.Posts is not null && InMemoryDataBaseCache.Categories.Count > 1)
+            {
+                foreach (Post post in publishedPosts)
+                {
+                    <div class="col-md-4 mb-3">
+                        <BlogPostCard Category=category Post="post" />
+                    </div>
+                }
+            }
+        }
+
+    </div>
+</main>
+
+@code {
+    [Parameter]
+    public string CategoryName { get; set; }
+
+    [Inject]
+    InMemoryDataBaseCache InMemoryDataBaseCache { get; set; }
+
+    private Category category = new();
+    private List<Post> publishedPosts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (InMemoryDataBaseCache.Categories is null)
+        {
+            await InMemoryDataBaseCache.GetCategoriesFromDatabaseAndCache(false);
+        }
+
+        category = await InMemoryDataBaseCache.GetCategoryByName(CategoryName.ConvertURLToTitle(), true, true);
+
+        if (category.Posts.Count != 0)
+        {
+            publishedPosts = [.. category.Posts.Where(post => post.Published == true)];
+
+        }
+        else
+        {
+
+            publishedPosts = [];
+        }
+
+    }
+}
