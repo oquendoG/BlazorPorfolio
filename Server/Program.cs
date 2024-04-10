@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Server.Data;
@@ -18,9 +19,14 @@ builder.Logging.AddSerilog(loggger);
 builder.Services.AddDbContext<AppDbContext>(options => options
                 .UseSqlite(builder.Configuration.GetConnectionString("conexion")));
 
+builder.Services.AddDefaultIdentity<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>();
+
 builder.Services.AddMapsterConfigs();
 builder.Services.AddMediatrConfigs();
 builder.Services.ConfigureCors();
+builder.Services.ConfigureJwt(builder.Configuration);
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -53,6 +59,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("CorsPolicy");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
