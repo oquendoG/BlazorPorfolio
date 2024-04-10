@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Shared.Models.Blog;
@@ -91,6 +92,52 @@ public class AppDbContext : IdentityDbContext
             };
         }
         modelBuilder.Entity<Post>().HasData(postsSeed);
+        #endregion
+
+        #region Administrator role seed
+        const string administratorRole = "Administrator";
+        IdentityRole administratorRoleToSeed = new()
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = administratorRole,
+            NormalizedName = administratorRole.ToUpperInvariant(),
+
+        };
+
+        modelBuilder.Entity<IdentityRole>().HasData(administratorRoleToSeed);
+
+        #endregion
+
+        #region Administrator user seed
+        const string administratorUserEmail = "oquendo999@gmail.com";
+        IPasswordHasher<IdentityUser> passwordHasher = new PasswordHasher<IdentityUser>();
+
+        IdentityUser administratorUser = new()
+        {
+            Id = Guid.NewGuid().ToString(),
+            UserName = administratorUserEmail,
+            NormalizedUserName = administratorUserEmail.ToUpperInvariant(),
+            Email = administratorUserEmail,
+            NormalizedEmail = administratorUserEmail.ToUpperInvariant(),
+            PasswordHash = string.Empty
+
+        };
+
+        administratorUser.PasswordHash = passwordHasher.HashPassword(administratorUser, "Admin12345*");
+
+        modelBuilder.Entity<IdentityUser>().HasData(administratorUser);
+
+        #endregion
+
+        #region Add administrator to role
+        IdentityUserRole<string> identityUserRole = new()
+        {
+            RoleId =  administratorRoleToSeed.Id,
+            UserId = administratorUser.Id
+        };
+
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(identityUserRole);
+
         #endregion
 
         base.OnModelCreating(modelBuilder);
