@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
+using Server.Helpers;
 using Shared.Models.Blog;
 using System.Text;
 
@@ -33,7 +34,7 @@ public static class AppServiceExtensions
             .TwoWays()
             .PreserveReference(true);
 
-        services.AddSingleton(serviceProvider => TypeAdapterConfig.GlobalSettings);
+        services.AddSingleton(_ => TypeAdapterConfig.GlobalSettings);
     }
 
     public static void AddMediatrConfigs(this IServiceCollection services)
@@ -52,6 +53,8 @@ public static class AppServiceExtensions
 
     public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<JWT>(configuration.GetRequiredSection("Jwt"));
+
         services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
