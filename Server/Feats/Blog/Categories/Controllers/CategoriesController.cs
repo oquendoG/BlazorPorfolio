@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Feats.Blog.Categories.Commands;
 using Server.Feats.Blog.Categories.DTOs;
@@ -8,6 +9,7 @@ namespace Server.Feats.Blog.Categories.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Administrator")]
 public class CategoriesController : ControllerBase
 {
     private readonly IMediator mediator;
@@ -21,12 +23,14 @@ public class CategoriesController : ControllerBase
 
     #region CrudOperations
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<List<CategoryDTO>>> Get()
     {
         return await mediator.Send(new GetCategoriesQueryRequest());
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> Get(Guid id)
     {
         CategoryPostsDTO category =
@@ -37,12 +41,14 @@ public class CategoriesController : ControllerBase
 
     //website.com/api/categories/withposts
     [HttpGet("withposts")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetWithPosts()
     {
         return Ok(await mediator.Send(new GetCategoriesWithPostsQueryRequest()));
     }
 
     //website.com/api/categories/id
+    [AllowAnonymous]
     [HttpGet("withposts/{id}")]
     public async Task<IActionResult> GetWithPosts(Guid id)
     {

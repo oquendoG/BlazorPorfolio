@@ -12,5 +12,4 @@ public class AuthResult
     public bool HasException { get; set; } = false;
 
     public List<string> Errors { get; set; }
-
 }

@@ -1,5 +1,6 @@
 ﻿using Mapster;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Feats.Blog.Posts.Commands;
 using Server.Feats.Blog.Posts.Queries;
@@ -9,6 +10,7 @@ namespace Server.Feats.Blog.Posts.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Administrator")]
 public class PostsController : ControllerBase
 {
     private readonly IMediator mediator;
@@ -22,11 +24,13 @@ public class PostsController : ControllerBase
 
     #region CrudOperations
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<List<Post>>> Get()
     {
         return await mediator.Send(new GetPostsQueryRequest());
     }
 
+    [AllowAnonymous]
     [HttpGet("dto/{id}")]
     public async Task<IActionResult> GetDto(Guid id)
     {
@@ -36,6 +40,7 @@ public class PostsController : ControllerBase
         return Ok(postDTO);
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(Guid id)
     {

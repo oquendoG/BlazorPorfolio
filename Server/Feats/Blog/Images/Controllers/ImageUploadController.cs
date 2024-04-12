@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Feats.Blog.Images.Commands;
 using Shared.Models.Blog;
@@ -7,6 +8,7 @@ namespace Server.Feats.Blog.Images.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Administrator")]
 public class ImageUploadController : ControllerBase
 {
     private readonly IMediator mediator;
