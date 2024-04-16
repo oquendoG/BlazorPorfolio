@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Feats.Blog.Auth.Dtos;
-using Server.Feats.Blog.Auth.Responses;
-using Server.Feats.Blog.Auth.Validators;
 using Server.Helpers;
+using Shared.Responses;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -17,7 +16,6 @@ public record SignInCommandRequest(UserDto User) : IRequest<AuthResult>;
 public class SignInCommandHandler(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager,
                         ILogger<SignInCommandHandler> logger, IOptionsSnapshot<JWT> options) : IRequestHandler<SignInCommandRequest, AuthResult>
 {
-    private readonly UserValidator userValidator = new();
     private readonly SignInManager<IdentityUser> signInManager = signInManager;
     private readonly UserManager<IdentityUser> userManager = userManager;
     private readonly ILogger<SignInCommandHandler> logger = logger;

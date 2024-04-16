@@ -1,0 +1,89 @@
+﻿<div class="d-flex w-100 min-vh-90 justify-content-center align-items-center">
+    <div class="row">
+        <div class="col shadow-no-hover p-5">
+            @if (singInSuccessfull)
+            {
+                <h3 class="text-center my-3">Te has autenticado correctamente, ahora vamos a la administración</h3>
+            }
+            else
+            {
+
+                <h3 class="text-center my-3">Debes autenticarte para entrar al area de administración</h3>
+
+                <EditForm Model="user" OnValidSubmit="SignInUser">
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                    <div class="form-group my-3">
+                        <label for="email">Correo electrónico</label>
+                        <InputText @bind-Value="user.Email" id="email" class="form-control"></InputText>
+                        <ValidationMessage For="@(() => user.Email)"></ValidationMessage>
+                    </div>
+
+                    <div class="form-group my-3">
+                        <label for="email">Contraseña</label>
+                        <InputText @bind-Value="user.Password" id="password" class="form-control" type="password"></InputText>
+                        <ValidationMessage For="@(() => user.Password)"></ValidationMessage>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary shadow w-100 md-f-size-1-5">Iniciar sesión</button>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="position-fixed bottom-0 end-50 z-index-5">
+
+    @if (singInSuccessfull)
+    {
+        <Toast IsError="false" ToastTitle="Inicio de sesión correcto"
+               ToastBody="Te has autenticado correctamente, ahora vamos a la administración"
+               ParentMethodToCallOnClickBtnClose="() => singInSuccessfull = false" />
+    }
+    @if (signinAttempFail)
+    {
+        <Toast IsError="true" ToastTitle="Inicio de sesión fallido"
+               ToastBody="Revisa toda la información e intenta de nuevo"
+               ParentMethodToCallOnClickBtnClose="() => signinAttempFail = false" />
+    }
+
+</div>
+
+@code {
+    [Inject] HttpClient httpClient { get; set; }
+    [Inject] ILocalStorageService localStorage { get; set; }
+    [Inject] AppAuthenticationStateProvider authenticationStateProvider { get; set; }
+    [Inject] NavigationManager navigationManager { get; set; }
+
+    private bool signinAttempFail = false;
+    private bool singInSuccessfull = false;
+    private User user = new();
+
+    private async Task SignInUser()
+    {
+        HttpResponseMessage response =
+            await httpClient.PostAsJsonAsync(ApiEndpoints.s_signIn, user);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            signinAttempFail = true;
+            return;
+        }
+
+        AuthResult JSONWebToken = await response.Content.ReadFromJsonAsync<AuthResult>();
+
+        await localStorage.SetItemAsync("bearerToken", JSONWebToken.Token);
+
+        await authenticationStateProvider.SignIn();
+
+        httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("bearer", JSONWebToken.Token);
+
+        singInSuccessfull = true;
+        navigationManager.NavigateTo("/admin");
+    }
+
+
+
+}

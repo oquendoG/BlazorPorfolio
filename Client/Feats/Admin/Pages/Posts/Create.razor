@@ -1,115 +1,122 @@
 ﻿@using System.Net;
 @page "/admin/posts/crear";
 
-<main class="admin-area-main">
-    <SideBar></SideBar>
+<AuthorizeView Roles="Administrator">
+    <Authorized Context="Auth">
+        <main class="admin-area-main">
+            <SideBar></SideBar>
 
-    <div class="admin-area-content container-fluid bg-white">
-        <div class="row g-0">
-            <div class="col">
-                <h1 class="mb-3">@(createSuccessful ? "Post creado correctamente" : "Crear post")</h1>
-                @if (attempingToCreate)
-                {
-                    <h2>Creando post...</h2>
-                    <Loading></Loading>
-                }
-                else if (createSuccessful is false && attempingToCreate is false)
-                {
-                    <EditForm Model="postToCreate" OnValidSubmit="CreatePost">
-                        <DataAnnotationsValidator />
-
-                        @if (InMemoryDataBaseCache.Categories == null)
+            <div class="admin-area-content container-fluid bg-white">
+                <div class="row g-0">
+                    <div class="col">
+                        <h1 class="mb-3">@(createSuccessful ? "Post creado correctamente" : "Crear post")</h1>
+                        @if (attempingToCreate)
                         {
+                            <h2>Creando post...</h2>
                             <Loading></Loading>
                         }
-                        else
+                        else if (createSuccessful is false && attempingToCreate is false)
                         {
-                            <div class="form-group mb-5">
-                                <label for="postCategory">Category</label>
-                                <InputSelect @bind-Value="@postToCreate.CategoryId" class="form-control" id="postCategory">
-                                    @foreach (var category in InMemoryDataBaseCache.Categories)
+                            <EditForm Model="postToCreate" OnValidSubmit="CreatePost">
+                                <DataAnnotationsValidator />
+
+                                @if (InMemoryDataBaseCache.Categories == null)
+                                {
+                                    <Loading></Loading>
+                                }
+                                else
+                                {
+                                    <div class="form-group mb-5">
+                                        <label for="postCategory">Category</label>
+                                        <InputSelect @bind-Value="@postToCreate.CategoryId" class="form-control" id="postCategory">
+                                            @foreach (var category in InMemoryDataBaseCache.Categories)
+                                            {
+                                                <option value="@category.Id">@category.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                }
+
+                                <div class="form-group mb-5">
+                                    <label for="postTitle">Post title</label>
+                                    <InputText @bind-Value="postToCreate.Title" class="form-control" id="postTitle"></InputText>
+                                    <ValidationMessage For="() => postToCreate.Title"></ValidationMessage>
+                                </div>
+
+                                <div class="form-group mb-5">
+                                    <label for="thumbnailImage">Thumbnail image (jpg/jpeg or png 1920x1080)</label>
+
+                                    @if (attemptingtoUploadImage == true)
                                     {
-                                        <option value="@category.Id">@category.Name</option>
+                                        <Loading></Loading>
                                     }
-                                </InputSelect>
-                            </div>
+                                    else if (attemptToUploadFailed == true)
+                                    {
+                                        <h4 class="text-danger">Failed to upload image. @reasonImageUploadFailed</h4>
+                                    }
+                                    else
+                                    {
+                                        <img src="@($"{ApiEndpoints.ServerBaseUrl}/{postToCreate.Thumbnailimage}")" class="admin-crud-form-thumbnail-image" alt="Post thumbnail image" />
+                                    }
+
+                                    <br />
+
+                                    <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailImage" />
+                                </div>
+
+                                <div class="form-group mb-5">
+                                    <label for="postExcerpt">Extracto del post</label>
+                                    <InputText @bind-Value="postToCreate.Excerpt" class="form-control" id="postExcerpt"></InputText>
+                                </div>
+
+                                <div class="form-group mb-5 flex-shrink-1">
+                                    <label>Contenido del post</label>
+                                    <div @ref="quillJsEditorDiv" class="border border-secondary p-4"></div>
+                                </div>
+
+                                <div class="form-group mb-5">
+                                    <label for="postPublished">Publicar post</label>
+                                    <InputCheckbox @bind-Value="@postToCreate.Published" class="form-check-input" id="postPublished" aria-describedby="postPublishedHelp" />
+                                    <div id="postPublishedHelp" class="form-text">
+                                        El valor de esto especifica si esta publicación de blog es visible en el sitio de cara al usuario o no.
+                                        La publicación de una publicación de blog también actualiza el valor del campo fecha de publicación.
+                                    </div>
+                                </div>
+
+                                <div class="form-group mb-5">
+                                    <label for="postAuthor">Autor del post</label>
+                                    <InputText @bind-Value="postToCreate.Author" class="form-control" id="postAuthor"></InputText>
+                                </div>
+
+
+
+                                <button class="btn btn-success shadow d-block mt-5 md-f-size-1-5" type="submit">
+                                    <i class="far fa-save"></i> Guardar
+                                </button>
+
+                            </EditForm>
                         }
+                        <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
 
-                        <div class="form-group mb-5">
-                            <label for="postTitle">Post title</label>
-                            <InputText @bind-Value="postToCreate.Title" class="form-control" id="postTitle"></InputText>
-                            <ValidationMessage For="() => postToCreate.Title"></ValidationMessage>
-                        </div>
+                        <div class="position-fixed bottom-0 end-50 z-index-5">
 
-                        <div class="form-group mb-5">
-                            <label for="thumbnailImage">Thumbnail image (jpg/jpeg or png 1920x1080)</label>
-
-                            @if (attemptingtoUploadImage == true)
+                            @if (attempingToCreateFailed)
                             {
-                                <Loading></Loading>
-                            }
-                            else if (attemptToUploadFailed == true)
-                            {
-                                <h4 class="text-danger">Failed to upload image. @reasonImageUploadFailed</h4>
-                            }
-                            else
-                            {
-                                <img src="@($"{ApiEndpoints.ServerBaseUrl}/{postToCreate.Thumbnailimage}")" class="admin-crud-form-thumbnail-image" alt="Post thumbnail image" />
+                                <Toast IsError="true" ToastTitle="No se pudo crear el post"
+                                       ToastBody="Intente de nuevo si el problema persiste contácte al administrador"
+                                       ParentMethodToCallOnClickBtnClose="() => attempingToCreateFailed = false" />
                             }
 
-                            <br />
-
-                            <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailImage" />
                         </div>
-
-                        <div class="form-group mb-5">
-                            <label for="postExcerpt">Extracto del post</label>
-                            <InputText @bind-Value="postToCreate.Excerpt" class="form-control" id="postExcerpt"></InputText>
-                        </div>
-
-                        <div class="form-group mb-5 flex-shrink-1">
-                            <label>Contenido del post</label>
-                            <div @ref="quillJsEditorDiv" class="border border-secondary p-4"></div>
-                        </div>
-
-                        <div class="form-group mb-5">
-                            <label for="postPublished">Publicar post</label>
-                            <InputCheckbox @bind-Value="@postToCreate.Published" class="form-check-input" id="postPublished" aria-describedby="postPublishedHelp" />
-                            <div id="postPublishedHelp" class="form-text">
-                                El valor de esto especifica si esta publicación de blog es visible en el sitio de cara al usuario o no.
-                                La publicación de una publicación de blog también actualiza el valor del campo fecha de publicación.
-                            </div>
-                        </div>
-
-                        <div class="form-group mb-5">
-                            <label for="postAuthor">Autor del post</label>
-                            <InputText @bind-Value="postToCreate.Author" class="form-control" id="postAuthor"></InputText>
-                        </div>
-
-
-
-                        <button class="btn btn-success shadow d-block mt-5 md-f-size-1-5" type="submit">
-                            <i class="far fa-save"></i> Guardar
-                        </button>
-
-                    </EditForm>
-                }
-                <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
-
-                <div class="position-fixed bottom-0 end-50 z-index-5">
-                    
-                    @if (attempingToCreateFailed)
-                    {
-                        <Toast IsError="true" ToastTitle="No se pudo crear el post"
-                               ToastBody="Intente de nuevo si el problema persiste contácte al administrador"
-                               ParentMethodToCallOnClickBtnClose="() => attempingToCreateFailed = false" />
-                    }
-
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</main>
+        </main>
+    </Authorized>
+    <NotAuthorized>
+        <Client.Feats.Admin.Auth.SignIn></Client.Feats.Admin.Auth.SignIn>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
 

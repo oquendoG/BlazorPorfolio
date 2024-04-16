@@ -3,8 +3,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Server.Feats.Blog.Auth.Commands;
 using Server.Feats.Blog.Auth.Dtos;
-using Server.Feats.Blog.Auth.Responses;
 using Server.Feats.Blog.Auth.Validators;
+using Shared.Responses;
 
 namespace Server.Feats.Blog.Auth.Controllers;
 [Route("api/[controller]")]

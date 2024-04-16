@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace Server.Feats.Blog.Auth.Responses;
+﻿namespace Shared.Responses;
 
 public class AuthResult
 {

@@ -1,78 +1,85 @@
 ﻿@using System.Net;
 @page "/admin/categorias/actualizar/{CategoryId:guid}";
 
-<main class="admin-area-main">
-    <SideBar></SideBar>
+<AuthorizeView Roles="Administrator">
+    <Authorized Context="Auth">
+        <main class="admin-area-main">
+            <SideBar></SideBar>
 
-    <div class="admin-area-content container-fluid bg-white">
-        <div class="row g-0">
-            <div class="col">
-                <h1 class="mb-3">@(updateSuccessful ? "Categoría actualizada correctamente" : "Actualizar categoría")</h1>
-                @if (CategoryToUpdate is null || attempingToUpdate)
-                {
-                    <h2>Actualizando categoría...</h2>
-                    <Loading></Loading>
-                }
-                else
-                {
-                    <EditForm Model="CategoryToUpdate" OnValidSubmit="UpdateCategory">
-                        <DataAnnotationsValidator />
+            <div class="admin-area-content container-fluid bg-white">
+                <div class="row g-0">
+                    <div class="col">
+                        <h1 class="mb-3">@(updateSuccessful ? "Categoría actualizada correctamente" : "Actualizar categoría")</h1>
+                        @if (CategoryToUpdate is null || attempingToUpdate)
+                        {
+                            <h2>Actualizando categoría...</h2>
+                            <Loading></Loading>
+                        }
+                        else
+                        {
+                            <EditForm Model="CategoryToUpdate" OnValidSubmit="UpdateCategory">
+                                <DataAnnotationsValidator />
 
-                        <div class="form-group mb-5">
-                            <label for="Name">Nombre de la categoría</label>
-                            <InputText @bind-Value="CategoryToUpdate.Name" id="Name" class="form-control"></InputText>
-                        </div>
+                                <div class="form-group mb-5">
+                                    <label for="Name">Nombre de la categoría</label>
+                                    <InputText @bind-Value="CategoryToUpdate.Name" id="Name" class="form-control"></InputText>
+                                </div>
 
-                        <div class="form-group mb-5">
-                            <label for="ThumbnailImage">Imágen de miniatura (jpg or png 1920 * 1080)</label>
-                            @if (attemptingtoUploadImage is true)
+                                <div class="form-group mb-5">
+                                    <label for="ThumbnailImage">Imágen de miniatura (jpg or png 1920 * 1080)</label>
+                                    @if (attemptingtoUploadImage is true)
+                                    {
+                                        <Loading></Loading>
+                                    }
+                                    else if (attemptToUploadFailed is true)
+                                    {
+                                        <h4 class="text-danger">Falló al cargar la imagen. @reasonImageUploadFailed</h4>
+                                    }
+                                    <img src="@($"{ApiEndpoints.ServerBaseUrl}/{CategoryToUpdate.ThumbnailImage}")"
+                                         alt="miniatura" class="admin-crud-form-thumbnail-image" />
+                                    <br />
+                                    <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailimage"></InputFile>
+                                </div>
+                                <div class="form-group mb-5">
+                                    <label for="Description">Descripción</label>
+                                    <InputText @bind-Value="CategoryToUpdate.Description" id="Description" class="form-control"></InputText>
+                                </div>
+
+                                <ValidationSummary></ValidationSummary>
+
+                                <button type="submit" class="btn btn-success d-block mt-5 md-f-size-1-5">
+                                    <i class="far fa-save"></i> Actualizar categoría
+                                </button>
+                                <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
+                            </EditForm>
+                        }
+
+                        <div class="position-fixed bottom-0 end-50 z-index-5">
+
+                            @if (updateSuccessful)
                             {
-                                <Loading></Loading>
+                                <Toast IsError="false" ToastTitle="Actualización correcta"
+                                       ToastBody="La actiualización se realizó correctamente"
+                                       ParentMethodToCallOnClickBtnClose="() => attemptToUploadFailed = false" />
                             }
-                            else if (attemptToUploadFailed is true)
+                            @if (attempingToUpdateFailed)
                             {
-                                <h4 class="text-danger">Falló al cargar la imagen. @reasonImageUploadFailed</h4>
+                                <Toast IsError="true" ToastTitle="Actualización fallida"
+                                       ToastBody="La actualización falló si el problema persiste contácte al administrador"
+                                       ParentMethodToCallOnClickBtnClose="() => attemptToUploadFailed = false" />
                             }
-                            <img src="@($"{ApiEndpoints.ServerBaseUrl}/{CategoryToUpdate.ThumbnailImage}")"
-                                 alt="miniatura" class="admin-crud-form-thumbnail-image" />
-                            <br />
-                            <InputFile OnChange="HandleUploadedImage" class="form-control mt-4" id="thumbnailimage"></InputFile>
-                        </div>
-                        <div class="form-group mb-5">
-                            <label for="Description">Descripción</label>
-                            <InputText @bind-Value="CategoryToUpdate.Description" id="Description" class="form-control"></InputText>
+
                         </div>
 
-                        <ValidationSummary></ValidationSummary>
-
-                        <button type="submit" class="btn btn-success d-block mt-5 md-f-size-1-5">
-                            <i class="far fa-save"></i> Actualizar categoría
-                        </button>
-                        <a href="/admin/categorias" class="btn btn-primary shadow mt-5 md-f-size-1-5">Ir a categorías</a>
-                    </EditForm>
-                }
-
-                <div class="position-fixed bottom-0 end-50 z-index-5">
-
-                    @if (updateSuccessful)
-                    {
-                        <Toast IsError="false" ToastTitle="Actualización correcta"
-                               ToastBody="La actiualización se realizó correctamente"
-                               ParentMethodToCallOnClickBtnClose="() => attemptToUploadFailed = false" />
-                    }
-                    @if (attempingToUpdateFailed)
-                    {
-                        <Toast IsError="true" ToastTitle="Actualización fallida"
-                               ToastBody="La actualización falló si el problema persiste contácte al administrador"
-                               ParentMethodToCallOnClickBtnClose="() => attemptToUploadFailed = false" />
-                    }
-
+                    </div>
                 </div>
-
             </div>
-        </div>
-    </div>
-</main>
+        </main>
+    </Authorized>
+    <NotAuthorized>
+        <Client.Feats.Admin.Auth.SignIn></Client.Feats.Admin.Auth.SignIn>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
 
