@@ -2,10 +2,11 @@
 using Server.Data;
 using Shared.Models.Blog;
 
-namespace Tests.ServerTests.Helpers;
+namespace Tests.ServerTests.Data;
 public class FaultyDbContext : AppDbContext
 {
-    public FaultyDbContext(DbContextOptions<AppDbContext> options) : base(options) { 
+    public FaultyDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
 
     }
 
@@ -16,6 +17,8 @@ public class FaultyDbContext : AppDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         Category category = new()
         {
             Id = Guid.NewGuid(),
@@ -24,5 +27,6 @@ public class FaultyDbContext : AppDbContext
             Name = Guid.NewGuid().ToString(),
         };
         modelBuilder.Entity<Category>().HasData(category);
+
     }
 }

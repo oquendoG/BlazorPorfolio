@@ -93,7 +93,7 @@ internal sealed class InMemoryDataBaseCache
             await GetCategoriesFromDatabaseAndCache(withPosts);
         }
 
-        Category category = categories.FirstOrDefault(cat => cat.Id == Id);
+        Category category = categories.Find(cat => cat.Id == Id);
         if (category.Posts is null && withPosts)
         {
             category = await httpClient.GetFromJsonAsync<Category>($"{ApiEndpoints.s_categoriesWithPosts}/{category.Id}");
@@ -149,7 +149,7 @@ internal sealed class InMemoryDataBaseCache
             await GetPostsFromDatabaseAndCache();
         }
 
-        return posts.FirstOrDefault(pst => pst.Id == Id);
+        return posts.Find(pst => pst.Id == Id);
     }
 
     internal async Task<PostDTO> GetPostDtoById(Guid Id)
@@ -177,7 +177,7 @@ internal sealed class InMemoryDataBaseCache
         List<Post> postFromDatabase = await httpClient
             .GetFromJsonAsync<List<Post>>(ApiEndpoints.s_posts);
 
-        posts = postFromDatabase.OrderByDescending(posts => posts.Id).ToList();
+        posts = [.. postFromDatabase.OrderByDescending(posts => posts.Id)];
 
         gettingPostsFromDatabaseAndCaching = false;
     }

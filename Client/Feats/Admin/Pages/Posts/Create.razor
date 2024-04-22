@@ -125,9 +125,9 @@
     [Inject] IJSRuntime JSRuntime { get; set; }
 
     private PostDTO postToCreate = new()
-        {
-            Thumbnailimage = Path.Combine("uploads", "placeholder.jpg")
-        };
+    {
+        Thumbnailimage = Path.Combine("uploads", "placeholder.jpg")
+    };
 
     private bool attempingToCreate = false;
     private bool attempingToCreateFailed;

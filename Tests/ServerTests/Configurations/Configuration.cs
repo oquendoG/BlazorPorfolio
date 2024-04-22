@@ -2,7 +2,7 @@
 using Server.Feats.Blog.Categories.DTOs;
 using Shared.Models.Blog;
 
-namespace Tests.Configurations;
+namespace Tests.ServerTests.Configurations;
 public static class Configuration
 {
     public static TypeAdapterConfig MapsterConfigurationForCategory()

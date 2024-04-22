@@ -6,7 +6,7 @@ using Server.Data;
 using Server.Feats.Blog.Categories.DTOs;
 using Server.Feats.Blog.Categories.Queries;
 using Shared.Models.Blog;
-using Tests.Configurations;
+using Tests.ServerTests.Configurations;
 using Tests.ServerTests.Helpers;
 
 namespace Tests.ServerTests.Blog.Categories.Queries;
