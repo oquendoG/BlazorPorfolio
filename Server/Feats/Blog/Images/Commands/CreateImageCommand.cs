@@ -9,8 +9,8 @@ public class CreateImageCommandHandler : IRequestHandler<CreateImageCommandReque
     private readonly ILogger<CreateImageCommandHandler> logger;
     private readonly IWebHostEnvironment hostEnvironment;
 
-    public CreateImageCommandHandler(
-        ILogger<CreateImageCommandHandler> logger, IWebHostEnvironment hostEnvironment)
+    public CreateImageCommandHandler(ILogger<CreateImageCommandHandler> logger, 
+        IWebHostEnvironment hostEnvironment)
     {
         this.logger = logger;
         this.hostEnvironment = hostEnvironment;
@@ -30,7 +30,7 @@ public class CreateImageCommandHandler : IRequestHandler<CreateImageCommandReque
             string imageFileName = guid + request.UploadedImage.NewImageFileExtension;
             string fullImageImageFileSystemPath = Path.Combine(hostEnvironment.ContentRootPath, "wwwroot", "uploads", imageFileName);
 
-            using FileStream filestream = File.Create(fullImageImageFileSystemPath);
+            await using FileStream filestream = File.Create(fullImageImageFileSystemPath);
             byte[] imageContent = Convert.FromBase64String(request.UploadedImage.NewImageBase64Content);
             await filestream.WriteAsync(imageContent, cancellationToken);
             filestream.Close();
